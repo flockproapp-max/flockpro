@@ -12,7 +12,6 @@
   - ✨ Custom styled confirmation modals (no more browser alerts!)
   - 🎯 Loading spinner on app initialization
   - 💀 Skeleton loaders while fetching data
-  - 🔄 Pull-to-refresh on mobile (swipe down to reload)
   - 📊 Image upload progress bar with percentage
   - ✅ Enhanced success notifications with icons
   - 🎭 Better error messages with styled modals
@@ -449,6 +448,8 @@
       button[type="submit"],
       .undo-btn,
       .mobile-menu-btn,
+      .del-btn,
+      .no-print,
       nav {
         display: none !important;
       }
@@ -2692,6 +2693,7 @@
     @media print {
       .top-nav,
       .flock-selection-card,
+      .no-print,
       .btn {
         display: none !important;
       }
@@ -3056,26 +3058,6 @@
       opacity: 0.9;
     }
     
-    /* Pull to Refresh Indicator */
-    .ptr-indicator {
-      position: fixed;
-      top: 60px;
-      left: 50%;
-      transform: translateX(-50%) scale(0);
-      background: rgba(34, 197, 94, 0.95);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 24px;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
-      z-index: 9995;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      backdrop-filter: blur(10px);
-    }
-    
-    .ptr-indicator.active {
-      transform: translateX(-50%) scale(1);
-    }
     
     /* Swipe to Delete */
     .flock-card-wrapper {
@@ -3184,6 +3166,7 @@
     @media print {
       .top-nav,
       .flock-selection-card,
+      .no-print,
       .btn {
         display: none !important;
       }
@@ -3750,6 +3733,7 @@
         this.accountFrozen = false; // Account freeze status
         this.suspendedAccount = false; // Account suspension status
         this.accountStatusListener = null; // Real-time status listener
+        this.themeDropdownListenerAdded = false; // Prevent duplicate theme dropdown listeners
         
         // Pagination
         this.flocksPerPage = 50; // Load 50 at a time
@@ -3766,12 +3750,6 @@
         this.sessionTimeoutWarning = null; // Timeout warning timer
         this.sessionTimeoutKill = null; // Actual timeout timer
         this.lastActivity = Date.now(); // Track user activity
-        this.pullToRefresh = {
-          startY: 0,
-          currentY: 0,
-          pulling: false,
-          threshold: 80
-        };
         this.imageViewerZoom = {
           scale: 1,
           translateX: 0,
@@ -3800,7 +3778,6 @@
         // V2.0 Initializations
         // Note: App loader disabled on init as it's too fast
         // Can be manually shown with app.showAppLoader(true) when needed
-        this.setupPullToRefresh();
         this.startSessionTimer();
         
         // Monitor online/offline for banner
@@ -3896,132 +3873,6 @@
         if (!this.user || !this.pin) return;
         await db.collection('users').doc(this.user.uid).update({
           hasPin: true
-        });
-      }
-
-      init() {
-        // Check for existing session
-        const session = this.navProtection.getSession();
-        if (session && session.pin && session.uid) {
-          console.log('✓ Restoring previous session');
-          this.pin = session.pin;
-          this.pinUnlocked = true;
-        }
-        
-        auth.onAuthStateChanged(async user => {
-          this.user = user;
-          
-          if (user) {
-            // SET UP REAL-TIME ACCOUNT STATUS LISTENER FIRST
-            // This must run BEFORE any other checks so freeze works immediately
-            if (!this.accountStatusListener) {
-              this.accountStatusListener = db.collection('users').doc(user.uid).onSnapshot(snapshot => {
-                if (snapshot.exists) {
-                  const userData = snapshot.data();
-                  const accountStatus = userData.status || 'active';
-                  const wasAccountFrozen = this.accountFrozen;
-                  
-                  // Check if account was suspended
-                  if (accountStatus === 'suspended') {
-                    console.log('🚫 Account suspended by admin - logging out');
-                    this.showToast('⚠️ Your account has been suspended. Contact your administrator.', 'error');
-                    setTimeout(() => {
-                      auth.signOut();
-                    }, 2000);
-                    return;
-                  }
-                  
-                  // Check if account freeze status changed
-                  if (accountStatus === 'frozen') {
-                    if (!wasAccountFrozen) {
-                      console.log('❄️ Account frozen by admin - accountFrozen is now TRUE');
-                      this.showToast('⚠️ Your account has been frozen. You can view data but cannot make changes.', 'warning');
-                    }
-                    this.accountFrozen = true;
-                    console.log('✅ Freeze check: accountFrozen =', this.accountFrozen);
-                    // Force UI update to show frozen banner and disable buttons
-                    this.render();
-                  } else {
-                    if (wasAccountFrozen) {
-                      console.log('✅ Account unfrozen by admin - accountFrozen is now FALSE');
-                      this.showToast('✅ Your account has been unfrozen. You can now make changes.', 'success');
-                    }
-                    this.accountFrozen = false;
-                    console.log('✅ Unfreeze check: accountFrozen =', this.accountFrozen);
-                    // Force UI update to remove frozen banner and enable buttons
-                    this.render();
-                  }
-                }
-              }, error => {
-                console.error('Error listening to account status:', error);
-              });
-            }
-            
-            // Load farm name and account status from Firestore
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            if (userDoc.exists) {
-              const userData = userDoc.data();
-              this.farmName = userData.farmName || '';
-              const hasPin = userData.hasPin || false;
-              const accountStatus = userData.status || 'active';
-              
-              // CHECK IF ACCOUNT IS SUSPENDED - Block login completely
-              if (accountStatus === 'suspended') {
-                // Log them out immediately
-                auth.signOut();
-                // Show suspended message
-                this.suspendedAccount = true;
-                this.render();
-                return;
-              }
-              
-              // CHECK IF ACCOUNT IS FROZEN - Read-only mode
-              if (accountStatus === 'frozen') {
-                this.accountFrozen = true;
-                console.log('🔒 INITIAL LOAD: Account is frozen, accountFrozen =', this.accountFrozen);
-              } else {
-                this.accountFrozen = false;
-                console.log('✅ INITIAL LOAD: Account is active, accountFrozen =', this.accountFrozen);
-              }
-              
-              if (hasPin && !this.pinUnlocked) {
-                // User has a PIN but hasn't unlocked yet
-                this.render(); // Will show PIN unlock screen
-                return;
-              } else if (!hasPin) {
-                // New user, needs to create PIN
-                this.render(); // Will show PIN setup screen
-                return;
-              }
-            }
-            
-            this.loadSettings();
-            this.loadFlocks();
-            this.loadDraft();
-          } else {
-            // Clean up listener when user logs out
-            if (this.accountStatusListener) {
-              this.accountStatusListener();
-              this.accountStatusListener = null;
-            }
-            
-            this.pinUnlocked = false;
-            this.pin = null;
-            this.suspendedAccount = false;
-            this.accountFrozen = false;
-            this.render();
-          }
-        });
-        
-        // Auto-save draft every 30 seconds (store ID for cleanup)
-        this.draftSaveInterval = setInterval(() => this.saveDraft(), 30000);
-        
-        // Close theme dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-          const themeSelector = document.querySelector('.theme-selector');
-          if (themeSelector && !themeSelector.contains(e.target)) {
-            this.closeThemeDropdown();
-          }
         });
       }
 
@@ -4627,15 +4478,176 @@
       }
 
       init() {
-        auth.onAuthStateChanged(user => {
+        // Check for existing session
+        const session = this.navProtection.getSession();
+        if (session && session.pin && session.uid) {
+          console.log('✓ Restoring previous session');
+          this.pin = session.pin;
+          this.pinUnlocked = true;
+        }
+        
+        auth.onAuthStateChanged(async user => {
           this.user = user;
+          
           if (user) {
+            // SET UP REAL-TIME ACCOUNT STATUS LISTENER FIRST
+            // This must run BEFORE any other checks so freeze works immediately
+            // CRITICAL FIX: Always detach old listener and create new one to prevent stale connections
+            if (this.accountStatusListener) {
+              this.accountStatusListener(); // Detach old listener
+            }
+            
+            console.log('🔄 Setting up real-time account status listener for UID:', user.uid);
+            this.accountStatusListener = db.collection('users').doc(user.uid).onSnapshot(snapshot => {
+              console.log('📡 LISTENER FIRED! Snapshot exists:', snapshot.exists);
+              console.log('📡 Current timestamp:', new Date().toISOString());
+              
+              if (snapshot.exists) {
+                const userData = snapshot.data();
+                const accountStatus = userData.status || 'active';
+                const wasAccountFrozen = this.accountFrozen;
+                
+                console.log('📊 Account status changed:', accountStatus);
+                
+                // Check if account was suspended
+                if (accountStatus === 'suspended') {
+                  console.log('🚫 Account suspended by admin - logging out');
+                  this.showToast('⚠️ Your account has been suspended. Contact your administrator.', 'error');
+                  setTimeout(() => {
+                    auth.signOut();
+                  }, 2000);
+                  return;
+                }
+                
+                // Check if account freeze status changed
+                if (accountStatus === 'frozen') {
+                  if (!wasAccountFrozen) {
+                    console.log('❄️ REAL-TIME CHANGE DETECTED: Account frozen by admin');
+                    this.showToast('⚠️ Your account has been frozen. You can view data but cannot make changes.', 'warning');
+                  }
+                  this.accountFrozen = true;
+                  console.log('✅ Setting accountFrozen = TRUE');
+                  
+                  // CRITICAL: Multiple aggressive UI update methods
+                  console.log('🔄 Calling render()...');
+                  this.render();
+                  
+                  console.log('🔄 Calling updateAllButtonStates()...');
+                  this.updateAllButtonStates();
+                  
+                  // NUCLEAR OPTION: Force show frozen banner immediately in DOM
+                  setTimeout(() => {
+                    console.log('🔄 Forcing frozen banner to appear...');
+                    const mainContent = document.querySelector('.main-content');
+                    if (mainContent && !document.querySelector('.frozen-banner')) {
+                      const banner = document.createElement('div');
+                      banner.className = 'frozen-banner';
+                      banner.style.cssText = 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px; text-align: center; font-weight: 600; position: sticky; top: 0; z-index: 100;';
+                      banner.innerHTML = '❄️ Account Frozen - Read Only Mode - Contact Administrator';
+                      mainContent.insertBefore(banner, mainContent.firstChild);
+                      console.log('✅ Frozen banner injected into DOM');
+                    }
+                  }, 100);
+                  
+                } else {
+                  if (wasAccountFrozen) {
+                    console.log('✅ REAL-TIME CHANGE DETECTED: Account unfrozen by admin');
+                    this.showToast('✅ Your account has been unfrozen. You can now make changes.', 'success');
+                  }
+                  this.accountFrozen = false;
+                  console.log('✅ Setting accountFrozen = FALSE');
+                  
+                  // CRITICAL: Multiple aggressive UI update methods
+                  console.log('🔄 Calling render()...');
+                  this.render();
+                  
+                  console.log('🔄 Calling updateAllButtonStates()...');
+                  this.updateAllButtonStates();
+                  
+                  // NUCLEAR OPTION: Force remove frozen banner from DOM
+                  setTimeout(() => {
+                    console.log('🔄 Removing frozen banner if exists...');
+                    const banner = document.querySelector('.frozen-banner');
+                    if (banner) {
+                      banner.remove();
+                      console.log('✅ Frozen banner removed from DOM');
+                    }
+                  }, 100);
+                }
+              }
+            }, error => {
+              console.error('❌ Error in account status listener:', error);
+            });
+            
+            // Load farm name and account status from Firestore
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            
+            if (userDoc.exists) {
+              const userData = userDoc.data();
+              
+              this.farmName = userData.farmName || '';
+              const hasPin = userData.hasPin || false;
+              const accountStatus = userData.status || 'active';
+              
+              // CHECK IF ACCOUNT IS SUSPENDED - Block login completely
+              if (accountStatus === 'suspended') {
+                // Log them out immediately
+                auth.signOut();
+                // Show suspended message
+                this.suspendedAccount = true;
+                this.render();
+                return;
+              }
+              
+              // CHECK IF ACCOUNT IS FROZEN - Read-only mode
+              if (accountStatus === 'frozen') {
+                this.accountFrozen = true;
+              } else {
+                this.accountFrozen = false;
+              }
+              
+              if (hasPin && !this.pinUnlocked) {
+                // User has a PIN but hasn't unlocked yet
+                this.render(); // Will show PIN unlock screen
+                return;
+              } else if (!hasPin) {
+                // New user, needs to create PIN
+                this.render(); // Will show PIN setup screen
+                return;
+              }
+            }
+            
             this.loadSettings();
             this.loadFlocks();
+            this.loadDraft();
           } else {
+            // Clean up listener when user logs out
+            if (this.accountStatusListener) {
+              this.accountStatusListener();
+              this.accountStatusListener = null;
+            }
+            
+            this.pinUnlocked = false;
+            this.pin = null;
+            this.suspendedAccount = false;
+            this.accountFrozen = false;
             this.render();
           }
         });
+        
+        // Auto-save draft every 30 seconds (store ID for cleanup)
+        this.draftSaveInterval = setInterval(() => this.saveDraft(), 30000);
+        
+        // Close theme dropdown when clicking outside (only add once)
+        if (!this.themeDropdownListenerAdded) {
+          document.addEventListener('click', (e) => {
+            const themeSelector = document.querySelector('.theme-selector');
+            if (themeSelector && !themeSelector.contains(e.target)) {
+              this.closeThemeDropdown();
+            }
+          });
+          this.themeDropdownListenerAdded = true;
+        }
       }
 
       async loadSettings() {
@@ -4716,11 +4728,23 @@
                       if (decrypted !== null && decrypted !== undefined) {
                         data[field] = decrypted;
                       } else {
-                        console.warn(`Failed to decrypt ${field} for flock ${data.id}`);
+                        // Decryption failed - likely wrong PIN or corrupted data
+                        // Only log this once per flock, not for every field
+                        if (!data._decryptWarningShown) {
+                          console.warn(`⚠️ Could not decrypt financial data for flock ${data.id}. This may be because:`);
+                          console.warn(`   1. The flock was encrypted with a different PIN`);
+                          console.warn(`   2. The data was corrupted`);
+                          console.warn(`   Using default value (0) for encrypted fields.`);
+                          data._decryptWarningShown = true;
+                        }
                         data[field] = 0; // Default to 0 if decryption fails
                       }
                     } catch (decryptError) {
-                      console.error(`Error decrypting ${field}:`, decryptError);
+                      // Only log detailed errors if not already warned
+                      if (!data._decryptErrorShown) {
+                        console.error(`❌ Decryption error for flock ${data.id}:`, decryptError.message);
+                        data._decryptErrorShown = true;
+                      }
                       data[field] = 0;
                     }
                   }
@@ -5200,6 +5224,42 @@
         // Remove any potential HTML/script tags to prevent XSS
         return str.replace(/<[^>]*>/g, '').trim();
       }
+      
+      // CRITICAL: Update all button states when freeze status changes in real-time
+      updateAllButtonStates() {
+        console.log('🔄 updateAllButtonStates called - accountFrozen =', this.accountFrozen);
+        
+        // Disable/enable all action buttons based on freeze status
+        const actionButtons = document.querySelectorAll(
+          'button[onclick*="saveFlock"], ' +
+          'button[onclick*="deleteFlock"], ' +
+          'button[onclick*="showAddFlockForm"], ' +
+          'button[onclick*="editFlock"], ' +
+          'button:contains("Add Flock"), ' +
+          'button:contains("Save"), ' +
+          'button:contains("Delete"), ' +
+          '.add-flock-btn, ' +
+          '.save-btn, ' +
+          '.delete-btn, ' +
+          '.edit-btn'
+        );
+        
+        actionButtons.forEach(btn => {
+          if (this.accountFrozen) {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            btn.title = 'Account is frozen - contact administrator';
+          } else {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            btn.title = '';
+          }
+        });
+        
+        console.log('✅ Updated', actionButtons.length, 'button states');
+      }
 
       formatDate(dateStr) {
         if (!dateStr || dateStr.length !== 10) return dateStr;
@@ -5497,11 +5557,18 @@
 
       async signIn() {
         const farmName = document.getElementById('farmName').value.trim();
-        const email = document.getElementById('email').value;
+        const email = document.getElementById('email').value.toLowerCase().trim();
         const password = document.getElementById('password').value;
         
         if (!farmName) {
           alert('Please enter your farm name');
+          return;
+        }
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          alert('❌ Please enter a valid email address');
           return;
         }
         
@@ -5534,23 +5601,56 @@
           return;
         }
         
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          alert('❌ Please enter a valid email address');
+          return;
+        }
+        
+        // Block temporary/disposable email services
+        const disposableEmailDomains = [
+          'tempmail.com', 'guerrillamail.com', '10minutemail.com', 'throwaway.email',
+          'mailinator.com', 'maildrop.cc', 'temp-mail.org', 'getnada.com',
+          'trashmail.com', 'yopmail.com', 'fakeinbox.com', 'sharklasers.com',
+          'grr.la', 'spam4.me', 'getairmail.com', 'inboxkitten.com',
+          'emailondeck.com', 'dispostable.com', 'mintemail.com', 'mytemp.email',
+          'guerrillamailblock.com', 'spambog.com', 'mohmal.com', 'emailfake.com',
+          'throwawaymail.com', 'tempinbox.com', 'fakemailgenerator.com'
+        ];
+        
+        const emailDomain = email.split('@')[1];
+        if (disposableEmailDomains.includes(emailDomain)) {
+          alert('❌ Temporary or disposable email addresses are not allowed.\n\nPlease use a legitimate business or personal email address.');
+          return;
+        }
+        
         try {
-          // CHECK IF EMAIL IS APPROVED BEFORE ALLOWING REGISTRATION
-          const approvedEmailsDoc = await db.collection('admin').doc('approvedEmails').get();
+          // ═══════════════════════════════════════════════════════════
+          // INVITE MODE TOGGLE - Change this to control registration
+          // ═══════════════════════════════════════════════════════════
+          const INVITE_MODE_ENABLED = false;  // Set to true to enable invite-only mode
+          // ═══════════════════════════════════════════════════════════
           
-          if (!approvedEmailsDoc.exists) {
-            alert('❌ Registration is currently disabled. Contact your administrator.');
-            return;
+          if (INVITE_MODE_ENABLED) {
+            // INVITE MODE ON: Check if email is approved
+            const approvedEmailsDoc = await db.collection('admin').doc('approvedEmails').get();
+            
+            if (!approvedEmailsDoc.exists) {
+              alert('❌ Registration is currently disabled. Contact your administrator.');
+              return;
+            }
+            
+            const approvedEmails = approvedEmailsDoc.data().emails || [];
+            
+            if (!approvedEmails.includes(email)) {
+              alert('❌ This email is not approved for registration.\n\nYour administrator must add your email to the approved list before you can create an account.\n\nContact your administrator for access.');
+              return;
+            }
           }
+          // INVITE MODE OFF: Any legitimate email (non-disposable) can register
           
-          const approvedEmails = approvedEmailsDoc.data().emails || [];
-          
-          if (!approvedEmails.includes(email)) {
-            alert('❌ This email is not approved for registration.\n\nYour administrator must add your email to the approved list before you can create an account.\n\nContact your administrator for access.');
-            return;
-          }
-          
-          // Email is approved - proceed with registration
+          // Proceed with registration
           await auth.createUserWithEmailAndPassword(email, password);
           
           // Save the farm name to Firestore
@@ -5706,10 +5806,28 @@
         // Save that user has a PIN
         await this.saveUserPin();
         
-        // Reload farm name
+        // Reload farm name AND CHECK ACCOUNT STATUS
         const userDoc = await db.collection('users').doc(this.user.uid).get();
         if (userDoc.exists) {
-          this.farmName = userDoc.data().farmName || '';
+          const userData = userDoc.data();
+          this.farmName = userData.farmName || '';
+          
+          // CHECK FREEZE STATUS AFTER PIN SETUP
+          const accountStatus = userData.status || 'active';
+          
+          if (accountStatus === 'suspended') {
+            auth.signOut();
+            this.suspendedAccount = true;
+            this.render();
+            return;
+          }
+          
+          if (accountStatus === 'frozen') {
+            this.accountFrozen = true;
+            this.showToast('⚠️ Your account is frozen - Read-only mode active', 'warning');
+          } else {
+            this.accountFrozen = false;
+          }
         }
         
         // Load the app
@@ -5760,10 +5878,28 @@
         // Save session for navigation protection
         this.navProtection.saveSession(this.pin, this.user.uid, this.user.email);
         
-        // Reload farm name
+        // Reload farm name AND CHECK ACCOUNT STATUS
         const userDoc = await db.collection('users').doc(this.user.uid).get();
         if (userDoc.exists) {
-          this.farmName = userDoc.data().farmName || '';
+          const userData = userDoc.data();
+          this.farmName = userData.farmName || '';
+          
+          // CHECK FREEZE STATUS AFTER PIN UNLOCK
+          const accountStatus = userData.status || 'active';
+          
+          if (accountStatus === 'suspended') {
+            auth.signOut();
+            this.suspendedAccount = true;
+            this.render();
+            return;
+          }
+          
+          if (accountStatus === 'frozen') {
+            this.accountFrozen = true;
+            this.showToast('⚠️ Your account is frozen - Read-only mode active', 'warning');
+          } else {
+            this.accountFrozen = false;
+          }
         }
         
         // Load the app
@@ -6147,7 +6283,7 @@
             <a href="#" class="del-btn" onclick="${this.accountFrozen ? 'return false;' : `app.deleteFlock('${this.currentFlock.docId}'); return false;`}" ${this.accountFrozen ? 'style="opacity: 0.5; cursor: not-allowed; pointer-events: none;" title="Account frozen - cannot delete"' : ''}>DELETE FLOCK</a>
             
             <!-- Notes Section -->
-            <div class="modern-card" style="margin-top: 24px;">
+            <div class="modern-card no-print" style="margin-top: 24px;">
               <h3>📝 Notes${this.settings.enableImageUpload ? ' & Photos' : ''} for Flock #${this.currentFlock.id}</h3>
               <p style="color: #888; margin-bottom: 20px;">Keep track of important information${this.settings.enableImageUpload ? ', observations, and photos' : ' and observations'} about this flock.</p>
               
@@ -6190,7 +6326,7 @@
         
         return `
           <div class="container">
-            <div class="modern-card">
+            <div class="modern-card no-print">
               <h3>📝 Notes${this.settings.enableImageUpload ? ' & Photos' : ''} for Flock #${this.currentFlock.id}</h3>
               
               ${this.settings.enableImageUpload ? `
@@ -7281,7 +7417,7 @@
                 Professional poultry management with real-time analytics, advanced charts, and comprehensive reporting
               </p>
               <p style="color: #555; margin-top: 8px; font-size: 0.9em;">
-                ✨ New in v2.0: Custom modals, pull-to-refresh, image viewer, session management, profit charts, PDF export, backup/restore, and more!
+                ✨ New in v2.0: Custom modals, image viewer, session management, profit charts, PDF export, backup/restore, and more!
               </p>
             </div>
           </div>
@@ -8106,67 +8242,6 @@ Current data will be REPLACED. Are you sure?`,
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
       }
       
-      // Pull to Refresh
-      setupPullToRefresh() {
-        const container = document.getElementById('app');
-        if (!container) return;
-        
-        let indicator = document.getElementById('ptr-indicator');
-        if (!indicator) {
-          indicator = document.createElement('div');
-          indicator.id = 'ptr-indicator';
-          indicator.className = 'ptr-indicator';
-          indicator.textContent = '🔄 Release to refresh';
-          document.body.appendChild(indicator);
-        }
-        
-        container.addEventListener('touchstart', (e) => {
-          if (container.scrollTop === 0) {
-            this.pullToRefresh.startY = e.touches[0].clientY;
-            this.pullToRefresh.pulling = true;
-          }
-        }, { passive: true });
-        
-        container.addEventListener('touchmove', (e) => {
-          if (!this.pullToRefresh.pulling) return;
-          
-          this.pullToRefresh.currentY = e.touches[0].clientY;
-          const diff = this.pullToRefresh.currentY - this.pullToRefresh.startY;
-          
-          if (diff > 0 && diff < 150) {
-            if (diff > this.pullToRefresh.threshold) {
-              indicator.classList.add('active');
-            } else {
-              indicator.classList.remove('active');
-            }
-          }
-        }, { passive: true });
-        
-        container.addEventListener('touchend', async () => {
-          if (!this.pullToRefresh.pulling) return;
-          
-          const diff = this.pullToRefresh.currentY - this.pullToRefresh.startY;
-          
-          if (diff > this.pullToRefresh.threshold) {
-            indicator.textContent = '⏳ Refreshing...';
-            if (navigator.vibrate) navigator.vibrate(50);
-            
-            await this.loadFlocks();
-            this.showToast('✓ Data refreshed!');
-            
-            setTimeout(() => {
-              indicator.classList.remove('active');
-              indicator.textContent = '🔄 Release to refresh';
-            }, 1000);
-          } else {
-            indicator.classList.remove('active');
-          }
-          
-          this.pullToRefresh.pulling = false;
-          this.pullToRefresh.startY = 0;
-          this.pullToRefresh.currentY = 0;
-        });
-      }
       
       // Image Viewer with Zoom
       showImageViewer(imageUrl) {
@@ -8262,7 +8337,7 @@ Current data will be REPLACED. Are you sure?`,
           labels: shippedFlocks.map(f => f.id),
           datasets: [{
             label: 'Profit per Flock',
-            data: shippedFlocks.map(f => (f.revenue - f.totalCost) / 100),
+            data: shippedFlocks.map(f => ((f.revenue || 0) - this.calcTotalExpenses(f)) / 100),
             borderColor: '#22c55e',
             backgroundColor: 'rgba(34, 197, 94, 0.1)',
             borderWidth: 3,
@@ -8308,7 +8383,7 @@ Current data will be REPLACED. Are you sure?`,
         
         const profits = shippedFlocks.map(f => ({
           id: f.id,
-          profit: (f.revenue - f.totalCost) / 100
+          profit: ((f.revenue || 0) - this.calcTotalExpenses(f)) / 100
         }));
         
         profits.sort((a, b) => b.profit - a.profit);
@@ -8335,7 +8410,7 @@ Current data will be REPLACED. Are you sure?`,
             f.id,
             f.barn || '-',
             f.shipped.toString(),
-            `$${((f.revenue - f.totalCost) / 100).toFixed(2)}`
+            `$${(((f.revenue || 0) - this.calcTotalExpenses(f)) / 100).toFixed(2)}`
           ]);
           
           doc.autoTable({
@@ -8537,7 +8612,7 @@ v1.2 - February 4, 2026 (Data Validation & UX Improvements)
 v1.1 - February 4, 2026 (Navigation Protection Update)
 ─────────────────────────────────────────────────────────────
 🛡️ NAVIGATION PROTECTION:
-  - Enhanced pull-to-refresh prevention
+  - Enhanced browser navigation protection
   - Back button protection with confirmation
   - Session persistence (30-minute timeout)
   - Refresh confirmation (F5, Ctrl+R)
