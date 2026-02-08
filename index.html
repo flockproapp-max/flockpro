@@ -130,7 +130,7 @@
 -->
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -188,18 +188,19 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       overscroll-behavior-y: contain !important;
-      overscroll-behavior-x: contain !important;
+      overscroll-behavior-x: auto; /* Changed from contain to auto - allows horizontal scroll when zoomed */
       will-change: background-color;
       position: fixed;
       width: 100%;
       overflow: hidden;
+      touch-action: pan-x pan-y; /* Enable both horizontal and vertical panning */
     }
     
     /* Main container to handle scrolling */
     #app {
       height: 100vh;
       overflow-y: auto;
-      overflow-x: hidden;
+      overflow-x: auto; /* Changed from hidden to auto - allows horizontal scroll when zoomed */
       overscroll-behavior: contain !important;
       -webkit-overflow-scrolling: touch;
     }
@@ -1727,6 +1728,7 @@
       margin: 0 auto;
       padding: 32px 24px;
       animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      min-width: 0; /* Allow container to shrink below content width */
     }
     
     @media (min-width: 1600px) {
@@ -2589,6 +2591,20 @@
       .expense-breakdown {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+      }
+      
+      /* Ensure tables can scroll horizontally when zoomed on mobile */
+      .modern-card > div[style*="overflow-x: auto"],
+      div[style*="overflow-x: auto"] {
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x pan-y; /* Allow both horizontal and vertical scrolling */
+        overscroll-behavior-x: contain;
+      }
+      
+      /* Allow horizontal scrolling on tables when content overflows */
+      table {
+        max-width: 100%;
+        touch-action: pan-x pan-y;
       }
       
       /* Undo/Print buttons container */
@@ -6871,6 +6887,15 @@
                   </div>
                 `).join('')}
               </div>
+              
+              <!-- Generate Report Button -->
+              <div style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 2px solid rgba(255,255,255,0.1);">
+                <button onclick="app.generateReport()" class="btn btn-primary" id="generateReportBtn" 
+                  ${this.selectedFlockIds.length === 0 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}
+                  style="padding: 16px 48px; font-size: 1.1em; font-weight: 700;">
+                  📊 Generate Report
+                </button>
+              </div>
             </div>
 
             ${summary ? `
@@ -7438,12 +7463,26 @@
 
       selectAllFlocks() {
         this.selectedFlockIds = this.flocks.map(f => f.docId);
-        this.render();
+        
+        // Check all checkboxes without full re-render (prevents scroll jump)
+        this.flocks.forEach(flock => {
+          const checkbox = document.getElementById(`flock-${flock.docId}`);
+          if (checkbox) checkbox.checked = true;
+        });
+        
+        this.updateExportButtons();
       }
 
       selectNoFlocks() {
         this.selectedFlockIds = [];
-        this.render();
+        
+        // Uncheck all checkboxes without full re-render (prevents scroll jump)
+        this.flocks.forEach(flock => {
+          const checkbox = document.getElementById(`flock-${flock.docId}`);
+          if (checkbox) checkbox.checked = false;
+        });
+        
+        this.updateExportButtons();
       }
 
       toggleFlockSelection(docId) {
@@ -7453,6 +7492,63 @@
         } else {
           this.selectedFlockIds.push(docId);
         }
+        
+        // Update export button states without full re-render (prevents scroll jump)
+        this.updateExportButtons();
+      }
+      
+      updateExportButtons() {
+        // Update CSV button
+        const csvBtn = document.querySelector('button[onclick="app.exportToCSV()"]');
+        const pdfBtn = document.querySelector('button[onclick="app.exportToPDF()"]');
+        const reportBtn = document.getElementById('generateReportBtn');
+        
+        const isDisabled = this.selectedFlockIds.length === 0;
+        
+        if (csvBtn) {
+          csvBtn.disabled = isDisabled;
+          if (isDisabled) {
+            csvBtn.style.opacity = '0.5';
+            csvBtn.style.cursor = 'not-allowed';
+          } else {
+            csvBtn.style.opacity = '1';
+            csvBtn.style.cursor = 'pointer';
+          }
+        }
+        
+        if (pdfBtn) {
+          pdfBtn.disabled = isDisabled;
+          if (isDisabled) {
+            pdfBtn.style.opacity = '0.5';
+            pdfBtn.style.cursor = 'not-allowed';
+          } else {
+            pdfBtn.style.opacity = '1';
+            pdfBtn.style.cursor = 'pointer';
+          }
+        }
+        
+        if (reportBtn) {
+          reportBtn.disabled = isDisabled;
+          if (isDisabled) {
+            reportBtn.style.opacity = '0.5';
+            reportBtn.style.cursor = 'not-allowed';
+          } else {
+            reportBtn.style.opacity = '1';
+            reportBtn.style.cursor = 'pointer';
+          }
+        }
+      }
+      
+      generateReport() {
+        if (this.selectedFlockIds.length === 0) {
+          alert('Please select at least one flock to generate a report.');
+          return;
+        }
+        
+        // Scroll to top to show the report
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Re-render to show the report with selected flocks
         this.render();
       }
 
