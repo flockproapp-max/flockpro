@@ -130,7 +130,7 @@
 -->
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -193,7 +193,7 @@
       position: fixed;
       width: 100%;
       overflow: hidden;
-      touch-action: pan-x pan-y; /* Enable both horizontal and vertical panning */
+      touch-action: manipulation; /* Allows pinch-zoom and double-tap zoom */
     }
     
     /* Main container to handle scrolling */
@@ -2597,14 +2597,14 @@
       .modern-card > div[style*="overflow-x: auto"],
       div[style*="overflow-x: auto"] {
         -webkit-overflow-scrolling: touch;
-        touch-action: pan-x pan-y; /* Allow both horizontal and vertical scrolling */
+        touch-action: manipulation; /* Allow zoom while enabling scroll */
         overscroll-behavior-x: contain;
       }
       
       /* Allow horizontal scrolling on tables when content overflows */
       table {
         max-width: 100%;
-        touch-action: pan-x pan-y;
+        touch-action: manipulation; /* Allow pinch zoom on tables */
       }
       
       /* Undo/Print buttons container */
