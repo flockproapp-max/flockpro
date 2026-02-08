@@ -193,7 +193,7 @@
       position: fixed;
       width: 100%;
       overflow: hidden;
-      touch-action: manipulation; /* Allows pinch-zoom and double-tap zoom */
+      touch-action: pan-x pan-y pinch-zoom; /* Allow pan in both directions plus pinch zoom */
     }
     
     /* Main container to handle scrolling */
@@ -201,7 +201,8 @@
       height: 100vh;
       overflow-y: auto;
       overflow-x: auto; /* Changed from hidden to auto - allows horizontal scroll when zoomed */
-      overscroll-behavior: contain !important;
+      overscroll-behavior-y: contain; /* Only prevent pull-to-refresh, allow horizontal pan */
+      overscroll-behavior-x: auto; /* Allow horizontal scroll when zoomed */
       -webkit-overflow-scrolling: touch;
     }
     
@@ -4885,7 +4886,7 @@
             const financialFields = ['revenue', 'fCost', 'pCost', 'meds', 'clean', 'pest', 'water', 
               'equip', 'repairs', 'electric', 'gas', 'coal', 'loading', 'shavings', 'labor', 
               'depreciation', 'fuel', 'pricePerLb', 'feedLbs', 'weight', 'placed', 'shipped',
-              'misc1', 'misc2', 'misc3', 'misc4'];
+              'misc1', 'misc2', 'misc3', 'misc4', 'notes'];
             
             financialFields.forEach(field => {
               if (flockToSave[field] !== undefined && flockToSave[field] !== null && flockToSave[field] !== 0) {
@@ -7352,31 +7353,6 @@
               </button>
             </div>
 
-            <div class="modern-card">
-              <h3>💾 Backup & Restore</h3>
-              <p style="color: #888; margin-bottom: 20px;">
-                Download a backup of all your flock data or restore from a previous backup
-              </p>
-              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <button onclick="app.downloadBackup()" class="btn btn-primary" style="min-width: 180px;">
-                  📥 Download Backup
-                </button>
-                <button onclick="document.getElementById('restore-file-input').click()" class="btn btn-secondary" style="min-width: 180px;">
-                  📤 Restore Backup
-                </button>
-                <input 
-                  type="file" 
-                  id="restore-file-input" 
-                  accept=".json" 
-                  style="display: none;" 
-                  onchange="app.handleRestoreFile(event)"
-                >
-              </div>
-              <p style="color: #666; font-size: 0.85em; margin-top: 12px; line-height: 1.5;">
-                💡 Tip: Download regular backups to keep your data safe. The backup file is encrypted with your PIN.
-              </p>
-            </div>
-
             <!-- V2.0: Backup & Restore -->
             <div class="modern-card backup-restore-card">
               <h3>💾 Backup & Restore</h3>
@@ -8134,13 +8110,20 @@
             }
 
             // Show confirmation modal
-            this.showConfirmModal(
-              'Restore Backup',
-              `This will restore ${decryptedData.flocks.length} flock(s) from ${new Date(decryptedData.exportDate).toLocaleDateString()}. 
+            this.showConfirm({
+              title: 'Restore Backup',
+              message: `This will restore ${decryptedData.flocks.length} flock(s) from ${new Date(decryptedData.exportDate).toLocaleDateString()}. 
               
 Current data will be REPLACED. Are you sure?`,
-              () => this.restoreBackup(decryptedData)
-            );
+              icon: '⚠️',
+              confirmText: 'Restore',
+              cancelText: 'Cancel',
+              isDanger: true
+            }).then(confirmed => {
+              if (confirmed) {
+                this.restoreBackup(decryptedData);
+              }
+            });
 
           } catch (error) {
             this.showToast('Failed to read backup file: ' + error.message, 'error');
