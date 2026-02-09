@@ -209,6 +209,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check-compat.js"></script>
   <!-- Firebase Storage NOT needed - using ImgBB cloud storage -->
   <!-- ImgBB API: Free image hosting with 32MB per image limit -->
   
@@ -3392,6 +3393,11 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    
+    // Initialize App Check with reCAPTCHA v3
+    const appCheck = firebase.appCheck();
+    appCheck.activate('6LfXmZ4qAAAAABOtYU4_lM8CkpBN3xRfKYMlB7Ls', true); // reCAPTCHA site key, auto-refresh enabled
+    
     // Firebase Storage NOT needed - using base64 storage
 
     // =========================
