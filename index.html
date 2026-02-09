@@ -7,6 +7,24 @@
   ║              Professional Poultry Management System           ║
   ╚═══════════════════════════════════════════════════════════════╝
 
+  ⚠️⚠️⚠️ IMPORTANT - WHEN UPDATING THIS APP ⚠️⚠️⚠️
+  ════════════════════════════════════════════════════════════════
+  
+  📝 EVERY TIME YOU MAKE CHANGES AND UPLOAD TO GITHUB:
+  
+  1. Search for "this.appVersion" in this file (around line ~4000)
+  2. INCREMENT THE VERSION NUMBER:
+     - Current: '2.1.1'
+     - Next update: '2.1.2'
+     - Then: '2.1.3', etc.
+  
+  3. This triggers the automatic "New Update Available" banner
+     for users who have the app installed on their phones!
+  
+  4. Without updating this number, users won't be notified of updates!
+  
+  ════════════════════════════════════════════════════════════════
+
   ✅ SECURITY STATUS - FULLY HARDENED ON February 8, 2026
   ════════════════════════════════════════════════════════════════
   🔒 COMPLETE SECURITY IMPLEMENTATION:
@@ -3992,6 +4010,14 @@
         this.accountStatusListener = null; // Real-time status listener
         this.themeDropdownListenerAdded = false; // Prevent duplicate theme dropdown listeners
         
+        // App version and update detection
+        // ⚠️ IMPORTANT: INCREMENT THIS VERSION NUMBER EVERY TIME YOU UPDATE THE APP!
+        // ⚠️ Change 2.1.1 → 2.1.2 → 2.1.3, etc. whenever you push changes to GitHub
+        // ⚠️ This triggers the "New Update Available" banner for users
+        this.appVersion = '2.1.1'; // <-- CHANGE THIS NUMBER WHEN YOU UPDATE!
+        this.updateCheckInterval = null; // Check for updates periodically
+        this.updateAvailable = false; // Flag for update notification
+        
         // Pagination
         this.flocksPerPage = 50; // Load 50 at a time
         this.lastVisible = null; // Last document for pagination
@@ -5269,6 +5295,183 @@
         });
       }
 
+      // Check for app updates (for PWA installations)
+      checkForUpdates() {
+        this.showConfirm({
+          title: 'Check for Updates',
+          message: 'This will reload the app and clear the cache to get the latest version. Any unsaved changes will be lost. Continue?',
+          icon: '🔄',
+          confirmText: 'Update Now',
+          isDanger: false
+        }).then(confirmed => {
+          if (confirmed) {
+            this.performUpdate();
+          }
+        });
+      }
+
+      // Perform the actual update
+      performUpdate() {
+        // Show loading message
+        this.showToast('Updating app...', 'info');
+        
+        // Clear service worker cache if exists
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            registrations.forEach(registration => {
+              registration.unregister();
+            });
+          });
+        }
+        
+        // Clear cache storage
+        if ('caches' in window) {
+          caches.keys().then(names => {
+            names.forEach(name => {
+              caches.delete(name);
+            });
+          });
+        }
+        
+        // Force reload from server (not cache)
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 500);
+      }
+
+      // Start checking for updates automatically
+      startUpdateChecker() {
+        // Check immediately on load
+        this.checkForNewVersion();
+        
+        // Then check every 5 minutes
+        this.updateCheckInterval = setInterval(() => {
+          this.checkForNewVersion();
+        }, 5 * 60 * 1000); // 5 minutes
+      }
+
+      // Stop the update checker (cleanup)
+      stopUpdateChecker() {
+        if (this.updateCheckInterval) {
+          clearInterval(this.updateCheckInterval);
+          this.updateCheckInterval = null;
+        }
+      }
+
+      // Check if a new version is available
+      async checkForNewVersion() {
+        try {
+          // Fetch the current index.html from server
+          const response = await fetch(window.location.href, {
+            method: 'HEAD',
+            cache: 'no-cache',
+            headers: { 'Cache-Control': 'no-cache' }
+          });
+          
+          // Get the last-modified header
+          const lastModified = response.headers.get('last-modified');
+          
+          // Check if we have a stored last-modified date
+          const storedLastModified = localStorage.getItem('appLastModified');
+          
+          if (!storedLastModified) {
+            // First time, just store it
+            localStorage.setItem('appLastModified', lastModified);
+            localStorage.setItem('appVersion', this.appVersion);
+            return;
+          }
+          
+          // Compare dates - if different, update is available
+          if (lastModified !== storedLastModified) {
+            console.log('🔄 New version detected!');
+            this.updateAvailable = true;
+            this.showUpdateBanner();
+            
+            // Update stored date
+            localStorage.setItem('appLastModified', lastModified);
+          }
+          
+        } catch (error) {
+          console.log('Could not check for updates:', error);
+          // Fail silently - not critical
+        }
+      }
+
+      // Show update notification banner
+      showUpdateBanner() {
+        // Check if banner already exists
+        if (document.getElementById('update-banner')) return;
+        
+        const banner = document.createElement('div');
+        banner.id = 'update-banner';
+        banner.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 16px;
+          text-align: center;
+          z-index: 99999;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+          animation: slideDown 0.3s ease-out;
+        `;
+        
+        banner.innerHTML = `
+          <div style="max-width: 600px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+              <strong style="font-size: 16px;">🎉 New Update Available!</strong>
+              <p style="margin: 4px 0 0 0; font-size: 14px; opacity: 0.9;">
+                A new version of FlockPro is ready to install.
+              </p>
+            </div>
+            <div style="display: flex; gap: 12px;">
+              <button onclick="app.performUpdate()" style="
+                background: white;
+                color: #667eea;
+                border: none;
+                padding: 10px 24px;
+                border-radius: 6px;
+                font-weight: 600;
+                cursor: pointer;
+                font-size: 14px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+              ">
+                Update Now
+              </button>
+              <button onclick="document.getElementById('update-banner').remove()" style="
+                background: rgba(255,255,255,0.2);
+                color: white;
+                border: 1px solid rgba(255,255,255,0.3);
+                padding: 10px 20px;
+                border-radius: 6px;
+                font-weight: 500;
+                cursor: pointer;
+                font-size: 14px;
+              ">
+                Later
+              </button>
+            </div>
+          </div>
+        `;
+        
+        // Add slide down animation
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+          }
+        `;
+        document.head.appendChild(style);
+        
+        document.body.appendChild(banner);
+        
+        // Play a subtle notification sound (optional)
+        // this.playNotificationSound();
+      }
+
       // Load sample flocks for testing (10 realistic turkey flocks)
       async loadSampleFlocks() {
         const sampleFlocks = [
@@ -5510,6 +5713,11 @@
             root.innerHTML = this.renderPinSetup();
           });
           return;
+        }
+
+        // Start update checker (only once when user is logged in and unlocked)
+        if (!this.updateCheckInterval) {
+          this.startUpdateChecker();
         }
 
         let content = this.renderTopNav();
@@ -7518,6 +7726,19 @@
               </p>
               <button onclick="app.loadSampleFlocksWithConfirm()" class="btn btn-primary" style="max-width: 250px;">
                 Load Sample Flocks
+              </button>
+            </div>
+
+            <div class="modern-card">
+              <h3>🔄 App Updates</h3>
+              <p style="color: #888; margin-bottom: 12px;">
+                If you installed FlockPro as an app on your phone, click this button to check for and install the latest updates.
+              </p>
+              <p style="color: #666; font-size: 0.9em; margin-bottom: 20px;">
+                <strong>Note:</strong> The app caches old versions. This button forces a refresh to get the newest code.
+              </p>
+              <button onclick="app.checkForUpdates()" class="btn btn-primary" style="max-width: 250px;">
+                🔄 Check for Updates
               </button>
             </div>
 
