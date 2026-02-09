@@ -1,0 +1,35 @@
+{
+  "name": "FlockPro - Professional Poultry Management",
+  "short_name": "FlockPro",
+  "description": "Complete turkey flock management system for tracking expenses, revenue, and profitability",
+  "start_url": "/flockpro/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#16213e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/flockpro/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/flockpro/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "finance"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Add Flock",
+      "short_name": "Add",
+      "description": "Quickly add a new flock",
+      "url": "/flockpro/?action=add",
+      "icons": [{ "src": "/flockpro/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
