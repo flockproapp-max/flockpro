@@ -4014,7 +4014,7 @@
         // ⚠️ IMPORTANT: INCREMENT THIS VERSION NUMBER EVERY TIME YOU UPDATE THE APP!
         // ⚠️ Change 2.1.2 → 2.1.3 → 2.1.4, etc. whenever you push changes to GitHub
         // ⚠️ This triggers the "New Update Available" banner for users
-        this.appVersion = '2.1.4'; // <-- CHANGE THIS NUMBER WHEN YOU UPDATE!
+        this.appVersion = '2.1.7'; // <-- CHANGE THIS NUMBER WHEN YOU UPDATE!
         this.updateCheckInterval = null; // Check for updates periodically
         this.updateAvailable = false; // Flag for update notification
         
@@ -5724,7 +5724,7 @@
         }
         
         // Add beta footer to all pages
-        content += this.renderBetaFooter();
+        // content += this.renderBetaFooter(); // REMOVED - beta info is on Home page
 
         root.innerHTML = content;
         this.attachHandlers();
@@ -5943,27 +5943,114 @@
             </div>
 
             <!-- Beta Notice Card -->
-            <div class="modern-card" style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border: 1px solid rgba(34, 197, 94, 0.3);">
+            <div class="modern-card" style="background: var(--card-bg); border: 2px solid #22c55e;">
               <div style="display: flex; align-items: start; gap: 16px;">
                 <span style="font-size: 2.5em;">🎉</span>
                 <div style="flex: 1;">
-                  <h3 style="color: #22c55e; margin-bottom: 12px;">Free Beta Access</h3>
-                  <p style="color: #ddd; line-height: 1.6; margin-bottom: 16px;">
-                    You're getting <strong style="color: #22c55e;">free access</strong> during our testing phase. 
-                    When we officially launch, paid plans will be introduced with <strong style="color: #22c55e;">30 days advance notice</strong>.
+                  <h3 style="color: #16a34a; margin-bottom: 12px;">Free Beta Access</h3>
+                  <p style="color: var(--text-primary); line-height: 1.6; margin-bottom: 16px;">
+                    You're getting <strong style="color: #16a34a;">free access</strong> during our testing phase. 
+                    When we officially launch, paid plans will be introduced with <strong style="color: #16a34a;">30 days advance notice</strong>.
                   </p>
                   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-                    <div style="background: rgba(34, 197, 94, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #22c55e;">
-                      <div style="color: #22c55e; font-weight: 600; margin-bottom: 4px;">✓ 30 Day Notice</div>
-                      <div style="color: #888; font-size: 0.9em;">Before any pricing</div>
+                    <div style="background: #dcfce7; padding: 12px; border-radius: 8px; border-left: 3px solid #16a34a;">
+                      <div style="color: #15803d; font-weight: 600; margin-bottom: 4px;">✓ 30 Day Notice</div>
+                      <div style="color: #166534; font-size: 0.9em;">Before any pricing</div>
                     </div>
-                    <div style="background: rgba(34, 197, 94, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #22c55e;">
-                      <div style="color: #22c55e; font-weight: 600; margin-bottom: 4px;">✓ Your Data</div>
-                      <div style="color: #888; font-size: 0.9em;">Always exportable</div>
+                    <div style="background: #dcfce7; padding: 12px; border-radius: 8px; border-left: 3px solid #16a34a;">
+                      <div style="color: #15803d; font-weight: 600; margin-bottom: 4px;">✓ Your Data</div>
+                      <div style="color: #166534; font-size: 0.9em;">Always exportable</div>
                     </div>
-                    <div style="background: rgba(34, 197, 94, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #22c55e;">
-                      <div style="color: #22c55e; font-weight: 600; margin-bottom: 4px;">✓ Your Feedback</div>
-                      <div style="color: #888; font-size: 0.9em;">Shapes the product</div>
+                    <div style="background: #dcfce7; padding: 12px; border-radius: 8px; border-left: 3px solid #16a34a;">
+                      <div style="color: #15803d; font-weight: 600; margin-bottom: 4px;">✓ Your Feedback</div>
+                      <div style="color: #166534; font-size: 0.9em;">Shapes the product</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Installation Instructions Card (Collapsible) -->
+            <div class="modern-card" style="background: var(--card-bg); border: 1px solid rgba(34, 197, 94, 0.3);">
+              <div style="display: flex; align-items: start; gap: 16px;">
+                <span style="font-size: 2.5em;">📱</span>
+                <div style="flex: 1;">
+                  <div onclick="app.toggleInstallInstructions()" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <h3 style="color: #22c55e; margin: 0;">Install FlockPro on Your Device</h3>
+                    <span id="installToggleIcon" style="font-size: 1.5em; color: #22c55e; transition: transform 0.3s ease;">▼</span>
+                  </div>
+                  <p style="color: var(--text-primary); line-height: 1.6; margin-bottom: 20px;">
+                    Install FlockPro as an app for quick access and offline functionality. <span style="color: #888; font-style: italic;">Click to expand instructions ↓</span>
+                  </p>
+                  
+                  <div id="installInstructions" style="display: none;">
+                    <!-- iOS Instructions -->
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 8px; margin-bottom: 16px; border-left: 3px solid #3b82f6;">
+                      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <span style="font-size: 1.5em;">🍎</span>
+                        <h4 style="color: #3b82f6; margin: 0; font-size: 1.1em;">iPhone & iPad (Safari)</h4>
+                      </div>
+                      <ol style="color: var(--text-primary); line-height: 1.8; margin: 0; padding-left: 20px; font-size: 0.95em;">
+                        <li>Tap the <strong>Share button</strong> <span style="background: rgba(59, 130, 246, 0.2); padding: 2px 8px; border-radius: 4px; color: #3b82f6;">⎙</span> at the bottom (iPhone) or top (iPad)</li>
+                        <li>Scroll down and tap <strong>"Add to Home Screen"</strong> <span style="background: rgba(59, 130, 246, 0.2); padding: 2px 8px; border-radius: 4px; color: #3b82f6;">+</span></li>
+                        <li>Tap <strong>"Add"</strong> in the top right corner</li>
+                        <li>FlockPro will appear on your home screen like a native app! 🎉</li>
+                      </ol>
+                    </div>
+                    
+                    <!-- Android Instructions -->
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 8px; margin-bottom: 16px; border-left: 3px solid #10b981;">
+                      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <span style="font-size: 1.5em;">🤖</span>
+                        <h4 style="color: #10b981; margin: 0; font-size: 1.1em;">Android (Chrome)</h4>
+                      </div>
+                      <ol style="color: var(--text-primary); line-height: 1.8; margin: 0; padding-left: 20px; font-size: 0.95em;">
+                        <li>Tap the <strong>menu icon</strong> <span style="background: rgba(16, 185, 129, 0.2); padding: 2px 8px; border-radius: 4px; color: #10b981;">⋮</span> in the top right</li>
+                        <li>Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong></li>
+                        <li>Tap <strong>"Add"</strong> or <strong>"Install"</strong></li>
+                        <li>FlockPro will appear on your home screen! 🎉</li>
+                      </ol>
+                      <p style="color: #888; font-size: 0.85em; margin-top: 12px; margin-bottom: 0;">
+                        <strong>Note:</strong> Some Android browsers may show an automatic install banner at the top of the page.
+                      </p>
+                    </div>
+                    
+                    <!-- Desktop Instructions -->
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+                      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <span style="font-size: 1.5em;">💻</span>
+                        <h4 style="color: #f59e0b; margin: 0; font-size: 1.1em;">Desktop (Chrome, Edge, Safari)</h4>
+                      </div>
+                      <ol style="color: var(--text-primary); line-height: 1.8; margin: 0; padding-left: 20px; font-size: 0.95em;">
+                        <li>Look for the <strong>install icon</strong> <span style="background: rgba(245, 158, 11, 0.2); padding: 2px 8px; border-radius: 4px; color: #f59e0b;">⊕</span> in the address bar (right side)</li>
+                        <li>Click <strong>"Install"</strong> or <strong>"Install FlockPro"</strong></li>
+                        <li>FlockPro will open as a standalone app window! 🎉</li>
+                      </ol>
+                      <p style="color: #888; font-size: 0.85em; margin-top: 12px; margin-bottom: 0;">
+                        <strong>Alternative:</strong> Click the browser menu (⋮ or ⋯) → "Install FlockPro" or "Add to Desktop"
+                      </p>
+                    </div>
+                    
+                    <!-- Benefits callout -->
+                    <div style="background: rgba(34, 197, 94, 0.1); padding: 16px; border-radius: 8px; margin-top: 20px; border: 1px solid rgba(34, 197, 94, 0.3);">
+                      <div style="color: #22c55e; font-weight: 600; margin-bottom: 8px;">✨ Benefits of Installing:</div>
+                      <ul style="color: var(--text-primary); line-height: 1.6; margin: 0; padding-left: 20px; font-size: 0.9em;">
+                        <li>Launch FlockPro instantly from your home screen</li>
+                        <li>View your flock data offline (read-only access)</li>
+                        <li>Full-screen experience without browser bars</li>
+                        <li>Automatic updates when new features are released</li>
+                        <li>Faster performance and smoother animations</li>
+                      </ul>
+                    </div>
+                    
+                    <!-- Offline limitations warning -->
+                    <div style="background: rgba(245, 158, 11, 0.1); padding: 16px; border-radius: 8px; margin-top: 12px; border: 1px solid rgba(245, 158, 11, 0.3);">
+                      <div style="color: #f59e0b; font-weight: 600; margin-bottom: 8px;">⚠️ Offline Limitations:</div>
+                      <ul style="color: var(--text-primary); line-height: 1.6; margin: 0; padding-left: 20px; font-size: 0.9em;">
+                        <li><strong>View only when offline</strong> - You can browse your flocks but cannot save changes without internet</li>
+                        <li><strong>1-hour auth limit</strong> - If offline for more than 1 hour, you'll need to log in again when reconnected</li>
+                        <li><strong>Best practice:</strong> Stay connected when adding or editing flocks to ensure your data is safely backed up to the cloud</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
@@ -6054,6 +6141,21 @@
             ` : ''}
           </div>
         `;
+      }
+
+      toggleInstallInstructions() {
+        const instructions = document.getElementById('installInstructions');
+        const icon = document.getElementById('installToggleIcon');
+        
+        if (instructions && icon) {
+          if (instructions.style.display === 'none') {
+            instructions.style.display = 'block';
+            icon.textContent = '▲';
+          } else {
+            instructions.style.display = 'none';
+            icon.textContent = '▼';
+          }
+        }
       }
 
       renderAuth() {
@@ -7735,32 +7837,32 @@
               </form>
             </div>
 
-            <div class="modern-card" style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border: 1px solid rgba(34, 197, 94, 0.3);">
-              <h3 style="color: #22c55e; display: flex; align-items: center; gap: 8px;">
+            <div class="modern-card" style="background: var(--card-bg); border: 2px solid #22c55e;">
+              <h3 style="color: #16a34a; display: flex; align-items: center; gap: 8px;">
                 💎 Subscription Status
               </h3>
-              <div style="margin-top: 16px; padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2);">
+              <div style="margin-top: 16px; padding: 20px; background: #f0fdf4; border-radius: 8px; border: 2px solid #86efac;">
                 <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
                   <span style="font-size: 2em;">🎉</span>
                   <div>
-                    <p style="color: #22c55e; font-weight: 600; font-size: 1.1em; margin-bottom: 4px;">
+                    <p style="color: #15803d; font-weight: 600; font-size: 1.1em; margin-bottom: 4px;">
                       Free Beta Access
                     </p>
-                    <p style="color: #888; font-size: 0.9em;">
+                    <p style="color: #166534; font-size: 0.9em;">
                       Active since you joined
                     </p>
                   </div>
                 </div>
                 
-                <div style="background: rgba(34, 197, 94, 0.1); border-left: 3px solid #22c55e; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
-                  <p style="color: #ddd; line-height: 1.6; font-size: 0.95em;">
-                    You're currently enjoying free access during our beta testing phase. When we officially launch with paid plans, you'll receive <strong style="color: #22c55e;">30 days advance notice</strong>.
+                <div style="background: #dcfce7; border-left: 3px solid #16a34a; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+                  <p style="color: #14532d; line-height: 1.6; font-size: 0.95em;">
+                    You're currently enjoying free access during our beta testing phase. When we officially launch with paid plans, you'll receive <strong style="color: #15803d;">30 days advance notice</strong>.
                   </p>
                 </div>
                 
-                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 6px;">
-                  <p style="color: #888; font-size: 0.9em; line-height: 1.6;">
-                    <strong style="color: #22c55e;">Beta Tester Benefits:</strong><br>
+                <div style="padding: 12px; background: #dcfce7; border-radius: 6px; border: 1px solid #86efac;">
+                  <p style="color: #166534; font-size: 0.9em; line-height: 1.6;">
+                    <strong style="color: #15803d;">Beta Tester Benefits:</strong><br>
                     • Early access to new features<br>
                     • Your feedback shapes the product<br>
                     • Your data will always be exportable<br>
