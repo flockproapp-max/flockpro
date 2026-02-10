@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <!--
-<!--
   ╔═══════════════════════════════════════════════════════════════╗
   ║              FlockPro v2.1 - SINGLE FILE EDITION              ║
   ║              Professional Poultry Management System           ║
@@ -6113,14 +6112,14 @@
         }
       }
 
-      renderPinSetup() {
+      renderPinScreen(isSetup) {
         return `
           <div class="pin-container">
             <div class="pin-card">
               <div class="pin-header">
-                <div class="pin-icon">🔐</div>
-                <h2 class="pin-title">Create Your PIN</h2>
-                <p class="pin-subtitle">Set a 4-digit PIN to encrypt your farm data</p>
+                <div class="pin-icon">${isSetup ? '🔐' : '🦃'}</div>
+                <h2 class="pin-title">${isSetup ? 'Create Your PIN' : 'Welcome Back!'}</h2>
+                <p class="pin-subtitle">${isSetup ? 'Set a 4-digit PIN to encrypt your farm data' : 'Enter your 4-digit PIN to unlock'}</p>
               </div>
               
               <div class="pin-input-group">
@@ -6132,56 +6131,28 @@
               
               <div class="pin-error" id="pinError"></div>
               
-              <button onclick="app.submitPinSetup()" class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 1.1em;">
-                Set PIN & Continue
+              <button onclick="${isSetup ? 'app.submitPinSetup()' : 'app.submitPinUnlock()'}" class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 1.1em;">
+                ${isSetup ? 'Set PIN & Continue' : 'Unlock'}
               </button>
               
-              <button onclick="app.switchAccount()" class="btn btn-secondary" style="width: 100%; margin-top: 12px; padding: 12px;">
-                🔄 Switch Account / Sign Out
+              <button onclick="${isSetup ? 'app.switchAccount()' : 'app.signOut()'}" class="btn btn-secondary" style="width: 100%; margin-top: 12px; padding: 12px;">
+                ${isSetup ? '🔄 Switch Account / Sign Out' : 'Sign Out'}
               </button>
               
               <div class="pin-info">
-                🔒 Your data will be encrypted with this PIN<br>
-                ⚠️ Important: If you forget your PIN, you cannot recover your data
+                ${isSetup ? '🔒 Your data will be encrypted with this PIN<br>⚠️ Important: If you forget your PIN, you cannot recover your data' : '🔒 Your farm data is encrypted and secure'}
               </div>
             </div>
           </div>
         `;
       }
 
+      renderPinSetup() {
+        return this.renderPinScreen(true);
+      }
+
       renderPinUnlock() {
-        return `
-          <div class="pin-container">
-            <div class="pin-card">
-              <div class="pin-header">
-                <div class="pin-icon">🦃</div>
-                <h2 class="pin-title">Welcome Back!</h2>
-                <p class="pin-subtitle">Enter your 4-digit PIN to unlock</p>
-              </div>
-              
-              <div class="pin-input-group">
-                <input type="tel" class="pin-digit" id="pin1" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeyup="app.handlePinInput(event, 1)">
-                <input type="tel" class="pin-digit" id="pin2" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeyup="app.handlePinInput(event, 2)">
-                <input type="tel" class="pin-digit" id="pin3" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeyup="app.handlePinInput(event, 3)">
-                <input type="tel" class="pin-digit" id="pin4" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeyup="app.handlePinInput(event, 4)">
-              </div>
-              
-              <div class="pin-error" id="pinError"></div>
-              
-              <button onclick="app.submitPinUnlock()" class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 1.1em;">
-                Unlock
-              </button>
-              
-              <button onclick="app.signOut()" class="btn btn-secondary" style="width: 100%; margin-top: 12px; padding: 12px;">
-                Sign Out
-              </button>
-              
-              <div class="pin-info">
-                🔒 Your farm data is encrypted and secure
-              </div>
-            </div>
-          </div>
-        `;
+        return this.renderPinScreen(false);
       }
 
       handlePinInput(event, position) {
@@ -6725,14 +6696,14 @@
               
               ${this.settings.enableImageUpload ? `
                 <!-- Image Gallery -->
-                <div id="notes-images-${this.currentFlock.docId}" style="margin-bottom: 20px;">
+                <div id="flock-notes-images-${this.currentFlock.docId}" style="margin-bottom: 20px;">
                   ${this.currentFlock.images && this.currentFlock.images.length > 0 ? `
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px;">
                       ${this.currentFlock.images.map((img, idx) => {
                         const escapedImg = img.replace(/"/g, '&quot;');
                         return `
                         <div style="position: relative; border-radius: 8px; overflow: hidden; border: 2px solid #2a2a2a;">
-                          <img src="${img}" style="width: 100%; height: 150px; object-fit: cover; cursor: pointer;" onclick='app.viewImage("${escapedImg}")' />
+                          <img src="${img}" alt="Flock photo ${idx + 1}" style="width: 100%; height: 150px; object-fit: cover; cursor: pointer;" onclick='app.viewImage("${escapedImg}")' />
                           <button onclick="app.deleteImage('${this.currentFlock.docId}', ${idx}); return false;" style="position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.9); border: none; border-radius: 50%; width: 28px; height: 28px; color: white; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center;">×</button>
                         </div>
                       `}).join('')}
@@ -6743,12 +6714,12 @@
                 <!-- Image Upload -->
                 <div style="margin-bottom: 20px;">
                   <label style="display: block; margin-bottom: 8px; color: #22c55e; font-weight: 600;">📷 Add Photos</label>
-                  <input type="file" id="image-upload-${this.currentFlock.docId}" accept="image/*" multiple style="display: block; width: 100%; padding: 12px; background: #1a1a1a; border: 2px dashed #2a2a2a; border-radius: 8px; color: #888; cursor: pointer;" onchange="app.handleImageUpload(event, '${this.currentFlock.docId}')" />
+                  <input type="file" id="flock-image-upload-${this.currentFlock.docId}" accept="image/*" multiple style="display: block; width: 100%; padding: 12px; background: #1a1a1a; border: 2px dashed #2a2a2a; border-radius: 8px; color: #888; cursor: pointer;" onchange="app.handleImageUpload(event, '${this.currentFlock.docId}')" />
                   <p style="color: #666; font-size: 0.85em; margin-top: 8px;">💡 Images stored on ImgBB cloud (max 32MB each). Unlimited photos per flock!</p>
                 </div>
               ` : ''}
               
-              <form id="notes-form" onsubmit="if(app.accountFrozen) { app.showToast('⚠️ Account Frozen: Cannot save notes', 'error'); return false; } return app.handleSaveNotes(event);">
+              <form id="flock-notes-form" onsubmit="if(app.accountFrozen) { app.showToast('⚠️ Account Frozen: Cannot save notes', 'error'); return false; } return app.handleSaveNotes(event);">
                 <textarea name="notes" rows="15" placeholder="Enter your notes here...&#10;&#10;Examples:&#10;- Health observations&#10;- Feed changes&#10;- Weather conditions&#10;- Maintenance notes&#10;- Important dates" style="font-family: 'Space Mono', monospace; width: 100%; padding: 16px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; color: #fff; font-size: 14px; line-height: 1.6; resize: vertical;">${this.escapeHtml(this.currentFlock.notes || '')}</textarea>
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px; padding: 16px; font-size: 16px; font-weight: 600;">💾 SAVE NOTES</button>
               </form>
@@ -6767,7 +6738,7 @@
               
               ${this.settings.enableImageUpload ? `
                 <!-- Image Gallery -->
-                <div id="notes-images-${this.currentFlock.docId}" style="margin-bottom: 24px;">
+                <div id="page-notes-images-${this.currentFlock.docId}" style="margin-bottom: 24px;">
                   ${this.currentFlock.images && this.currentFlock.images.length > 0 ? `
                     <div style="margin-bottom: 16px;">
                       <h4 style="color: #22c55e; margin-bottom: 12px;">📷 Photos (${this.currentFlock.images.length})</h4>
@@ -6776,7 +6747,7 @@
                           const escapedImg = img.replace(/"/g, '&quot;');
                           return `
                           <div style="position: relative; border-radius: 8px; overflow: hidden; border: 2px solid #2a2a2a; background: #1a1a1a;">
-                            <img src="${img}" style="width: 100%; height: 150px; object-fit: cover; cursor: pointer; display: block;" onclick='app.viewImage("${escapedImg}")' />
+                            <img src="${img}" alt="Flock photo ${idx + 1}" style="width: 100%; height: 150px; object-fit: cover; cursor: pointer; display: block;" onclick='app.viewImage("${escapedImg}")' />
                             <button onclick="app.deleteImage('${this.currentFlock.docId}', ${idx}); return false;" style="position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.9); border: none; border-radius: 50%; width: 28px; height: 28px; color: white; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 18px;">×</button>
                           </div>
                         `}).join('')}
@@ -6792,7 +6763,7 @@
                   </label>
                   <input 
                     type="file" 
-                    id="image-upload-${this.currentFlock.docId}" 
+                    id="page-image-upload-${this.currentFlock.docId}" 
                     accept="image/*" 
                     multiple 
                     style="display: block; width: 100%; padding: 12px; background: #1a1a1a; border: 2px dashed #2a2a2a; border-radius: 8px; color: #888; cursor: pointer;" 
@@ -6803,7 +6774,7 @@
               ` : ''}
               
               <!-- Notes Section -->
-              <form id="notes-form" onsubmit="if(app.accountFrozen) { app.showToast('⚠️ Account Frozen: Cannot save notes', 'error'); return false; } return app.handleSaveNotes(event);">
+              <form id="page-notes-form" onsubmit="if(app.accountFrozen) { app.showToast('⚠️ Account Frozen: Cannot save notes', 'error'); return false; } return app.handleSaveNotes(event);">
                 <label style="display: block; margin-bottom: 8px; color: #22c55e; font-weight: 600;">📝 Notes</label>
                 <textarea 
                   name="notes" 
