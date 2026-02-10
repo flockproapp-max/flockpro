@@ -2607,7 +2607,7 @@
     .expense-row {
       display: flex;
       justify-content: space-between;
-      padding: 12px;
+      padding: 10px 8px;
       border-bottom: 1px solid #333;
       transition: all 0.3s ease;
       background: #1a1a1a;
@@ -2621,24 +2621,34 @@
     
     .expense-label {
       color: #9ca3af;
+      font-size: 0.9em;
     }
     
     .expense-value {
       font-weight: 600;
       color: #fff;
+      font-size: 0.9em;
     }
     
     /* Mobile centering for expense breakdown */
     @media(max-width: 767px) {
       .expense-breakdown {
         grid-template-columns: 1fr 1fr;
-        gap: 6px 8px;
-        padding: 0 8px;
+        gap: 6px 6px;
+        padding: 0 4px;
       }
       
       .expense-row {
-        padding: 10px 8px;
-        font-size: 0.9em;
+        padding: 8px 6px;
+        font-size: 0.85em;
+      }
+      
+      .expense-label {
+        font-size: 0.85em;
+      }
+      
+      .expense-value, .expense-row strong {
+        font-size: 0.85em;
       }
     }
     
@@ -7123,11 +7133,11 @@
                   <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
                     <thead>
                       <tr style="border-bottom: 2px solid ${document.body.classList.contains('light-mode') ? '#d1d5db' : '#444'};">
-                        <th style="text-align: left; padding: 12px; color: #22c55e;">Metric</th>
+                        <th style="text-align: left; padding: 8px 6px; color: #22c55e; font-size: 0.9em;">Metric</th>
                         ${compareFlocks.map(flock => `
-                          <th style="text-align: right; padding: 12px;">
+                          <th style="text-align: right; padding: 8px 6px; font-size: 0.9em;">
                             <div style="font-weight: 600; color: ${document.body.classList.contains('light-mode') ? '#1f2937' : '#fff'};">Flock #${flock.id}</div>
-                            ${flock.barn ? `<div style="font-size: 0.85em; color: ${document.body.classList.contains('light-mode') ? '#6b7280' : '#888'}; font-weight: 400;">${flock.barn}</div>` : ''}
+                            ${flock.barn ? `<div style="font-size: 0.8em; color: ${document.body.classList.contains('light-mode') ? '#6b7280' : '#888'}; font-weight: 400;">${flock.barn}</div>` : ''}
                           </th>
                         `).join('')}
                       </tr>
@@ -7204,9 +7214,9 @@
 
         return `
           <tr style="border-bottom: 1px solid ${borderColor};">
-            <td style="padding: 12px; color: ${labelColor};">${label}</td>
+            <td style="padding: 8px 6px; color: ${labelColor}; font-size: 0.9em;">${label}</td>
             ${values.map((v, idx) => `
-              <td style="padding: 12px; text-align: right; font-weight: ${idx === bestIndex ? 'bold' : 'normal'}; color: ${idx === bestIndex ? '#22c55e' : valueColor};">
+              <td style="padding: 8px 6px; text-align: right; font-weight: ${idx === bestIndex ? 'bold' : 'normal'}; color: ${idx === bestIndex ? '#22c55e' : valueColor}; font-size: 0.9em;">
                 ${v.displayValue}
                 ${idx === bestIndex && highlight ? ' 🏆' : ''}
               </td>
