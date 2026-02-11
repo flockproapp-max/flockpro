@@ -1793,7 +1793,7 @@
       -webkit-backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(42, 42, 42, 0.6);
       padding: 20px 32px;
-      padding-top: max(20px, env(safe-area-inset-top));
+      padding-top: max(50px, calc(20px + env(safe-area-inset-top)));
       padding-left: max(32px, env(safe-area-inset-left));
       padding-right: max(32px, env(safe-area-inset-right));
       display: flex;
@@ -2201,14 +2201,6 @@
       min-width: 0; /* Prevents grid blowout */
     }
     
-    /* Mobile: Single column for smaller phones only */
-    @media (max-width: 480px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-    }
-    
     /* PIN Screen Styles */
     .pin-container {
       display: flex;
@@ -2341,6 +2333,51 @@
     
     input::placeholder, textarea::placeholder {
       color: #666;
+    }
+    
+    /* iOS Safari Date Input Fixes */
+    input[type="date"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      text-align: left !important;
+      min-height: 48px;
+      height: 48px;
+      line-height: 1.5;
+      color: #fff !important;
+      -webkit-text-fill-color: #fff !important;
+      opacity: 1 !important;
+    }
+    
+    input[type="date"]::-webkit-date-and-time-value {
+      text-align: left !important;
+      color: #fff !important;
+      -webkit-text-fill-color: #fff !important;
+    }
+    
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      opacity: 0.7;
+      cursor: pointer;
+    }
+    
+    input[type="date"]::-webkit-datetime-edit {
+      color: #fff !important;
+      -webkit-text-fill-color: #fff !important;
+      padding: 0;
+    }
+    
+    input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+      color: #fff !important;
+      -webkit-text-fill-color: #fff !important;
+    }
+    
+    input[type="date"]::-webkit-datetime-edit-text,
+    input[type="date"]::-webkit-datetime-edit-month-field,
+    input[type="date"]::-webkit-datetime-edit-day-field,
+    input[type="date"]::-webkit-datetime-edit-year-field {
+      color: #fff !important;
+      -webkit-text-fill-color: #fff !important;
     }
     
     .money-group {
@@ -4032,7 +4069,7 @@
         // ⚠️ IMPORTANT: INCREMENT THIS VERSION NUMBER EVERY TIME YOU UPDATE THE APP!
         // ⚠️ Change 2.1.2 → 2.1.3 → 2.1.4, etc. whenever you push changes to GitHub
         // ⚠️ This triggers the "New Update Available" banner for users
-        this.appVersion = '2.2.0'; // <-- CHANGE THIS NUMBER WHEN YOU UPDATE!
+        this.appVersion = '2.2.4'; // <-- CHANGE THIS NUMBER WHEN YOU UPDATE!
         this.updateCheckInterval = null; // Check for updates periodically
         this.updateAvailable = false; // Flag for update notification
         
@@ -5020,7 +5057,7 @@
                 const financialFields = ['revenue', 'fCost', 'pCost', 'meds', 'clean', 'pest', 'water', 
                   'equip', 'repairs', 'electric', 'gas', 'coal', 'loading', 'shavings', 'labor', 
                   'depreciation', 'fuel', 'pricePerLb', 'feedLbs', 'weight', 'placed', 'shipped',
-                  'misc1', 'misc2', 'misc3', 'misc4'];
+                  'misc1', 'misc2', 'misc3', 'misc4', 'notes'];  // Added 'notes' to encrypted fields
                 
                 financialFields.forEach(field => {
                   if (data[field] && typeof data[field] === 'string' && data[field].includes('U2F')) {
@@ -5033,13 +5070,14 @@
                         // Decryption failed - likely wrong PIN or corrupted data
                         // Only log this once per flock, not for every field
                         if (!data._decryptWarningShown) {
-                          console.warn(`⚠️ Could not decrypt financial data for flock ${data.id}. This may be because:`);
+                          console.warn(`⚠️ Could not decrypt data for flock ${data.id}. This may be because:`);
                           console.warn(`   1. The flock was encrypted with a different PIN`);
                           console.warn(`   2. The data was corrupted`);
-                          console.warn(`   Using default value (0) for encrypted fields.`);
+                          console.warn(`   Using default values for encrypted fields.`);
                           data._decryptWarningShown = true;
                         }
-                        data[field] = 0; // Default to 0 if decryption fails
+                        // For notes, use empty string; for numbers, use 0
+                        data[field] = (field === 'notes') ? '' : 0;
                       }
                     } catch (decryptError) {
                       // Only log detailed errors if not already warned
@@ -5047,7 +5085,7 @@
                         console.error(`❌ Decryption error for flock ${data.id}:`, decryptError.message);
                         data._decryptErrorShown = true;
                       }
-                      data[field] = 0;
+                      data[field] = (field === 'notes') ? '' : 0;
                     }
                   }
                 });
@@ -5171,12 +5209,24 @@
               'misc1', 'misc2', 'misc3', 'misc4', 'notes'];
             
             financialFields.forEach(field => {
-              if (flockToSave[field] !== undefined && flockToSave[field] !== null && flockToSave[field] !== 0) {
-                const encrypted = this.encrypt(flockToSave[field], this.pin);
-                if (!encrypted) {
-                  throw new Error('Failed to encrypt data');
+              // For notes field, only encrypt if there's actual content
+              if (field === 'notes') {
+                if (flockToSave[field] && flockToSave[field].trim() !== '') {
+                  const encrypted = this.encrypt(flockToSave[field], this.pin);
+                  if (!encrypted) {
+                    throw new Error('Failed to encrypt notes');
+                  }
+                  flockToSave[field] = encrypted;
                 }
-                flockToSave[field] = encrypted;
+              } else {
+                // For numeric fields, encrypt if not 0, undefined, or null
+                if (flockToSave[field] !== undefined && flockToSave[field] !== null && flockToSave[field] !== 0) {
+                  const encrypted = this.encrypt(flockToSave[field], this.pin);
+                  if (!encrypted) {
+                    throw new Error('Failed to encrypt data');
+                  }
+                  flockToSave[field] = encrypted;
+                }
               }
             });
           }
