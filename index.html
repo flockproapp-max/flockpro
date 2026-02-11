@@ -2201,8 +2201,8 @@
       min-width: 0; /* Prevents grid blowout */
     }
     
-    /* Mobile: Single column for better spacing */
-    @media (max-width: 640px) {
+    /* Mobile: Single column for smaller phones only */
+    @media (max-width: 480px) {
       .form-grid {
         grid-template-columns: 1fr;
         gap: 16px;
@@ -4032,7 +4032,7 @@
         // ⚠️ IMPORTANT: INCREMENT THIS VERSION NUMBER EVERY TIME YOU UPDATE THE APP!
         // ⚠️ Change 2.1.2 → 2.1.3 → 2.1.4, etc. whenever you push changes to GitHub
         // ⚠️ This triggers the "New Update Available" banner for users
-        this.appVersion = '2.1.9'; // <-- CHANGE THIS NUMBER WHEN YOU UPDATE!
+        this.appVersion = '2.2.0'; // <-- CHANGE THIS NUMBER WHEN YOU UPDATE!
         this.updateCheckInterval = null; // Check for updates periodically
         this.updateAvailable = false; // Flag for update notification
         
