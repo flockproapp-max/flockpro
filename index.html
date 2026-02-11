@@ -4070,13 +4070,14 @@
         this.minVersion = null; // Minimum required app version
         this.adminSettingsListener = null; // Real-time listener for admin settings
         this.announcementsListener = null; // Real-time listener for announcements
+        this._versionGateTimer = null; // Auto-refresh timer when version gate fires
         this.themeDropdownListenerAdded = false; // Prevent duplicate theme dropdown listeners
         
         // App version and update detection
         // ⚠️ IMPORTANT: INCREMENT THIS VERSION NUMBER EVERY TIME YOU UPDATE THE APP!
         // ⚠️ Change 2.1.2 → 2.1.3 → 2.1.4, etc. whenever you push changes to GitHub
         // ⚠️ This triggers the "New Update Available" banner for users
-        this.appVersion = '2.2.8'; // <-- CHANGE THIS NUMBER WHEN YOU UPDATE!
+        this.appVersion = '2.2.9'; // <-- CHANGE THIS NUMBER WHEN YOU UPDATE!
         this.updateCheckInterval = null; // Check for updates periodically
         this.updateAvailable = false; // Flag for update notification
         
@@ -5424,6 +5425,19 @@
               this.maintenanceMode = data.maintenanceMode === true;
               this.minVersion = data.minVersion || null;
               
+              // If version gate just became active for this client, auto-update immediately
+              // Don't wait for the user to tap a button — start the cache clear now
+              if (this.minVersion && this.isVersionOutdated(this.appVersion, this.minVersion)) {
+                // Give the version gate screen 2 seconds to render, then auto-refresh
+                this.render();
+                if (!this._versionGateTimer) {
+                  this._versionGateTimer = setTimeout(() => {
+                    this.forceRefreshForUpdate();
+                  }, 2000);
+                }
+                return;
+              }
+              
               // If maintenance just switched ON while user is active, force re-render
               if (this.maintenanceMode && !wasInMaintenance) {
                 this.render();
@@ -5511,24 +5525,23 @@
                 Update Required
               </h1>
               <p style="color: #94a3b8; font-size: 1.1em; line-height: 1.7; margin-bottom: 24px;">
-                You're running FlockPro <strong style="color: #f1f5f9;">v${this.appVersion}</strong>, 
-                but version <strong style="color: #22c55e;">v${this.minVersion}</strong> or later is required to continue.
+                FlockPro needs to update before you can continue.<br>
+                This only takes a few seconds.
               </p>
               <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); 
                           border-radius: 12px; padding: 20px; margin-bottom: 32px;">
-                <p style="color: #22c55e; font-weight: 600; margin-bottom: 12px;">How to update:</p>
-                <p style="color: #86efac; font-size: 0.95em; line-height: 1.6; margin: 0;">
-                  Close the app completely, then reopen it.<br>
-                  If you installed it as a PWA, you may need to clear your browser cache.
+                <p style="color: #22c55e; font-weight: 600; margin-bottom: 8px;">🔄 Updating automatically...</p>
+                <p style="color: #86efac; font-size: 0.9em; margin: 0;">
+                  If this screen persists, tap the button below.
                 </p>
               </div>
               <button onclick="app.forceRefreshForUpdate()" 
                       style="background: #22c55e; color: white; border: none; border-radius: 10px; 
                              padding: 14px 32px; font-size: 1em; font-weight: 600; cursor: pointer; 
                              width: 100%; margin-bottom: 12px;">
-                🔄 Refresh Now
+                🔄 Tap to Update Now
               </button>
-              <p style="color: #475569; font-size: 0.85em;">You have v${this.appVersion} — need v${this.minVersion}</p>
+              <p style="color: #475569; font-size: 0.85em;">v${this.appVersion} → v${this.minVersion}</p>
             </div>
           </div>
         `;
@@ -5564,12 +5577,24 @@
       }
 
       forceRefreshForUpdate() {
+        // Step 1: Unregister all service workers
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            registrations.forEach(r => r.unregister());
+          });
+        }
+        // Step 2: Nuke all caches
         if ('caches' in window) {
           caches.keys().then(names => {
             names.forEach(name => caches.delete(name));
           });
         }
-        window.location.reload(true);
+        // Step 3: Clear the last-modified stamp so update checker resets
+        localStorage.removeItem('appLastModified');
+        // Step 4: Hard reload with cache-bust query string so GitHub Pages serves fresh file
+        setTimeout(() => {
+          window.location.href = window.location.pathname + '?v=' + Date.now();
+        }, 300);
       }
 
       // Start checking for updates automatically
