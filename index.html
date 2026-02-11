@@ -4070,7 +4070,6 @@
         this.minVersion = null; // Minimum required app version
         this.adminSettingsListener = null; // Real-time listener for admin settings
         this.announcementsListener = null; // Real-time listener for announcements
-        this._versionGateTimer = null; // Auto-refresh timer when version gate fires
         this.themeDropdownListenerAdded = false; // Prevent duplicate theme dropdown listeners
         
         // App version and update detection
@@ -5425,16 +5424,11 @@
               this.maintenanceMode = data.maintenanceMode === true;
               this.minVersion = data.minVersion || null;
               
-              // If version gate just became active for this client, auto-update immediately
-              // Don't wait for the user to tap a button — start the cache clear now
+              // If version gate is active for this client, show the gate screen.
+              // The gate replaces the entire UI — user cannot proceed without updating.
+              // No auto-timer needed; the screen itself is the enforcement.
               if (this.minVersion && this.isVersionOutdated(this.appVersion, this.minVersion)) {
-                // Give the version gate screen 2 seconds to render, then auto-refresh
                 this.render();
-                if (!this._versionGateTimer) {
-                  this._versionGateTimer = setTimeout(() => {
-                    this.forceRefreshForUpdate();
-                  }, 2000);
-                }
                 return;
               }
               
@@ -5530,9 +5524,9 @@
               </p>
               <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); 
                           border-radius: 12px; padding: 20px; margin-bottom: 32px;">
-                <p style="color: #22c55e; font-weight: 600; margin-bottom: 8px;">🔄 Updating automatically...</p>
+                <p style="color: #22c55e; font-weight: 600; margin-bottom: 8px;">How to update:</p>
                 <p style="color: #86efac; font-size: 0.9em; margin: 0;">
-                  If this screen persists, tap the button below.
+                  Tap the button below to clear the cache and load the latest version.
                 </p>
               </div>
               <button onclick="app.forceRefreshForUpdate()" 
@@ -5642,7 +5636,13 @@
           // Compare dates - if different, update is available
           if (lastModified !== storedLastModified) {
             this.updateAvailable = true;
-            this.showUpdateBanner();
+            
+            // Only show the polite dismissible banner if there's no version gate active.
+            // If minVersion is set and this client is outdated, the version gate already
+            // handles the update automatically — don't show a conflicting "Later" banner.
+            if (!this.minVersion || !this.isVersionOutdated(this.appVersion, this.minVersion)) {
+              this.showUpdateBanner();
+            }
             
             // Update stored date
             localStorage.setItem('appLastModified', lastModified);
