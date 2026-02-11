@@ -6378,9 +6378,11 @@
         
         try {
           // ═══════════════════════════════════════════════════════════
-          // INVITE MODE TOGGLE - Change this to control registration
+          // INVITE MODE - Reads from Admin Dashboard Settings
           // ═══════════════════════════════════════════════════════════
-          const INVITE_MODE_ENABLED = false;  // Set to true to enable invite-only mode
+          // Check if invite-only mode is enabled in Firestore
+          const settingsDoc = await db.collection('admin').doc('settings').get();
+          const INVITE_MODE_ENABLED = settingsDoc.exists && settingsDoc.data().inviteOnlyMode === true;
           // ═══════════════════════════════════════════════════════════
           
           if (INVITE_MODE_ENABLED) {
