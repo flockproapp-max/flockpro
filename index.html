@@ -4063,13 +4063,20 @@
         this.accountFrozen = false; // Account freeze status
         this.suspendedAccount = false; // Account suspension status
         this.accountStatusListener = null; // Real-time status listener
+        
+        // v1.3 Admin features
+        this.maintenanceMode = false; // Global maintenance mode
+        this.announcements = []; // Active system announcements
+        this.minVersion = null; // Minimum required app version
+        this.adminSettingsListener = null; // Real-time listener for admin settings
+        this.announcementsListener = null; // Real-time listener for announcements
         this.themeDropdownListenerAdded = false; // Prevent duplicate theme dropdown listeners
         
         // App version and update detection
         // ⚠️ IMPORTANT: INCREMENT THIS VERSION NUMBER EVERY TIME YOU UPDATE THE APP!
         // ⚠️ Change 2.1.2 → 2.1.3 → 2.1.4, etc. whenever you push changes to GitHub
         // ⚠️ This triggers the "New Update Available" banner for users
-        this.appVersion = '2.2.7'; // <-- CHANGE THIS NUMBER WHEN YOU UPDATE!
+        this.appVersion = '2.2.8'; // <-- CHANGE THIS NUMBER WHEN YOU UPDATE!
         this.updateCheckInterval = null; // Check for updates periodically
         this.updateAvailable = false; // Flag for update notification
         
@@ -4835,6 +4842,10 @@
           this.pinUnlocked = true;
         }
         
+        // v1.3: Start listening to admin settings (maintenance mode, announcements, min version)
+        // Run BEFORE auth so maintenance screen shows even on the login page
+        this.startAdminSettingsListeners();
+        
         auth.onAuthStateChanged(async user => {
           this.user = user;
           
@@ -5399,6 +5410,168 @@
         }, 500);
       }
 
+      // ─────────────────────────────────────────────────────────────────
+      // v1.3: ADMIN SETTINGS — Maintenance Mode, Announcements, Min Version
+      // ─────────────────────────────────────────────────────────────────
+
+      startAdminSettingsListeners() {
+        // Real-time listener for appSettings (maintenance mode, min version)
+        this.adminSettingsListener = db.collection('admin').doc('appSettings')
+          .onSnapshot(snapshot => {
+            if (snapshot.exists) {
+              const data = snapshot.data();
+              const wasInMaintenance = this.maintenanceMode;
+              this.maintenanceMode = data.maintenanceMode === true;
+              this.minVersion = data.minVersion || null;
+              
+              // If maintenance just switched ON while user is active, force re-render
+              if (this.maintenanceMode && !wasInMaintenance) {
+                this.render();
+              }
+              // If maintenance just switched OFF, re-render to let user back in
+              if (!this.maintenanceMode && wasInMaintenance) {
+                this.render();
+              }
+            } else {
+              this.maintenanceMode = false;
+              this.minVersion = null;
+            }
+            this.render();
+          }, error => {
+            // Silently fail — don't block the app if this collection doesn't exist yet
+            console.log('Admin appSettings not found (normal if not yet created):', error.code);
+          });
+
+        // Real-time listener for announcements
+        this.announcementsListener = db.collection('admin').doc('announcements')
+          .onSnapshot(snapshot => {
+            if (snapshot.exists) {
+              const data = snapshot.data();
+              const allAnnouncements = data.list || [];
+              const now = new Date();
+              // Filter out expired announcements
+              this.announcements = allAnnouncements.filter(a => {
+                if (!a.expiresAt) return true;
+                return new Date(a.expiresAt) > now;
+              });
+            } else {
+              this.announcements = [];
+            }
+            this.render();
+          }, error => {
+            console.log('Admin announcements not found (normal if not yet created):', error.code);
+            this.announcements = [];
+          });
+      }
+
+      isVersionOutdated(current, minimum) {
+        if (!minimum) return false;
+        const parseParts = v => (v || '0').split('.').map(n => parseInt(n, 10) || 0);
+        const cur = parseParts(current);
+        const min = parseParts(minimum);
+        for (let i = 0; i < Math.max(cur.length, min.length); i++) {
+          const c = cur[i] || 0;
+          const m = min[i] || 0;
+          if (c < m) return true;
+          if (c > m) return false;
+        }
+        return false;
+      }
+
+      renderMaintenanceScreen() {
+        return `
+          <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; 
+                      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 24px;">
+            <div style="text-align: center; max-width: 480px;">
+              <div style="font-size: 5em; margin-bottom: 24px;">🔧</div>
+              <h1 style="color: #f1f5f9; font-size: 2em; font-weight: 700; margin-bottom: 16px;">
+                Under Maintenance
+              </h1>
+              <p style="color: #94a3b8; font-size: 1.1em; line-height: 1.7; margin-bottom: 32px;">
+                FlockPro is currently down for scheduled maintenance.<br>
+                We'll be back shortly — thank you for your patience!
+              </p>
+              <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3); 
+                          border-radius: 12px; padding: 20px; margin-bottom: 32px;">
+                <p style="color: #fbbf24; font-weight: 600; margin: 0;">⏳ Check back in a few minutes</p>
+              </div>
+              <p style="color: #475569; font-size: 0.85em;">FlockPro v${this.appVersion}</p>
+            </div>
+          </div>
+        `;
+      }
+
+      renderVersionGateScreen() {
+        return `
+          <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; 
+                      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 24px;">
+            <div style="text-align: center; max-width: 480px;">
+              <div style="font-size: 5em; margin-bottom: 24px;">📱</div>
+              <h1 style="color: #f1f5f9; font-size: 2em; font-weight: 700; margin-bottom: 16px;">
+                Update Required
+              </h1>
+              <p style="color: #94a3b8; font-size: 1.1em; line-height: 1.7; margin-bottom: 24px;">
+                You're running FlockPro <strong style="color: #f1f5f9;">v${this.appVersion}</strong>, 
+                but version <strong style="color: #22c55e;">v${this.minVersion}</strong> or later is required to continue.
+              </p>
+              <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); 
+                          border-radius: 12px; padding: 20px; margin-bottom: 32px;">
+                <p style="color: #22c55e; font-weight: 600; margin-bottom: 12px;">How to update:</p>
+                <p style="color: #86efac; font-size: 0.95em; line-height: 1.6; margin: 0;">
+                  Close the app completely, then reopen it.<br>
+                  If you installed it as a PWA, you may need to clear your browser cache.
+                </p>
+              </div>
+              <button onclick="app.forceRefreshForUpdate()" 
+                      style="background: #22c55e; color: white; border: none; border-radius: 10px; 
+                             padding: 14px 32px; font-size: 1em; font-weight: 600; cursor: pointer; 
+                             width: 100%; margin-bottom: 12px;">
+                🔄 Refresh Now
+              </button>
+              <p style="color: #475569; font-size: 0.85em;">You have v${this.appVersion} — need v${this.minVersion}</p>
+            </div>
+          </div>
+        `;
+      }
+
+      renderAnnouncementBanners() {
+        if (!this.announcements || this.announcements.length === 0) return '';
+        
+        const priorityStyles = {
+          info:    { bg: 'linear-gradient(135deg, #1e40af, #1d4ed8)', border: '#3b82f6', icon: 'ℹ️', text: '#bfdbfe' },
+          warning: { bg: 'linear-gradient(135deg, #92400e, #b45309)', border: '#f59e0b', icon: '⚠️', text: '#fde68a' },
+          urgent:  { bg: 'linear-gradient(135deg, #7f1d1d, #991b1b)', border: '#ef4444', icon: '🚨', text: '#fecaca' }
+        };
+
+        return this.announcements.map(a => {
+          const style = priorityStyles[a.priority] || priorityStyles.info;
+          return `
+            <div style="background: ${style.bg}; border-left: 4px solid ${style.border}; 
+                        padding: 14px 20px; display: flex; align-items: flex-start; gap: 12px;
+                        position: relative;">
+              <span style="font-size: 1.3em; flex-shrink: 0; margin-top: 1px;">${style.icon}</span>
+              <div style="flex: 1; min-width: 0;">
+                <div style="color: white; font-weight: 700; font-size: 0.95em; margin-bottom: 3px;">
+                  ${this.escapeHtml(a.title)}
+                </div>
+                <div style="color: ${style.text}; font-size: 0.875em; line-height: 1.5;">
+                  ${this.escapeHtml(a.message)}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      forceRefreshForUpdate() {
+        if ('caches' in window) {
+          caches.keys().then(names => {
+            names.forEach(name => caches.delete(name));
+          });
+        }
+        window.location.reload(true);
+      }
+
       // Start checking for updates automatically
       startUpdateChecker() {
         // Check immediately on load
@@ -5743,6 +5916,18 @@
       render() {
         const root = document.getElementById('root');
         
+        // v1.3: Check maintenance mode first — show to everyone (including logged-out users)
+        if (this.maintenanceMode) {
+          root.innerHTML = this.renderMaintenanceScreen();
+          return;
+        }
+        
+        // v1.3: Check minimum version gate — block outdated clients
+        if (this.minVersion && this.isVersionOutdated(this.appVersion, this.minVersion)) {
+          root.innerHTML = this.renderVersionGateScreen();
+          return;
+        }
+        
         // Check if account is suspended - show suspension screen
         if (this.suspendedAccount) {
           root.innerHTML = this.renderSuspendedScreen();
@@ -5905,7 +6090,7 @@
           </div>
         ` : '';
         
-        return frozenBanner + `
+        return frozenBanner + this.renderAnnouncementBanners() + `
           <div class="top-nav">
             <div class="nav-brand">
               <img src="icon-192.png" alt="FlockPro Logo" style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover;">
