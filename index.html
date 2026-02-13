@@ -5937,7 +5937,7 @@
         // If decimals specified, truncate (don't round) to that many decimal places
         if (decimals !== null) {
           const multiplier = Math.pow(10, decimals);
-          return (Math.floor(Number(val) * multiplier) / multiplier).toFixed(decimals);
+          return Math.floor(Number(val) * multiplier) / multiplier;
         }
         // Just return the plain number
         return val;
