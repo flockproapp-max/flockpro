@@ -5931,9 +5931,13 @@
         return (neg ? '-$' : '$') + absVal.toLocaleString();
       }
 
-      fmtInput(val) {
+      fmtInput(val, decimals = null) {
         if (val === 0 || !val) return '';
         // Don't add commas - number inputs reject them!
+        // If decimals specified, format to that many decimal places
+        if (decimals !== null) {
+          return Number(val).toFixed(decimals);
+        }
         // Just return the plain number
         return val;
       }
@@ -7093,16 +7097,16 @@
                   <div class="money-group">
                     <label>Paid per lb</label>
                     <span class="dollar-label">$</span>
-                    <input type="number" name="pricePerLb" value="${this.fmtInput(this.currentFlock.pricePerLb)}" min="0" max="10" step="0.0001" inputmode="decimal">
+                    <input type="number" name="pricePerLb" value="${this.fmtInput(this.currentFlock.pricePerLb, 4)}" min="0" max="10" step="0.0001" inputmode="decimal">
                   </div>
                   <div class="money-group">
                     <label>Revenue</label>
                     <span class="dollar-label">$</span>
-                    <input type="number" name="revenue" value="${this.fmtInput(this.currentFlock.revenue)}" min="0" max="99999999" step="0.01" inputmode="decimal">
+                    <input type="number" name="revenue" value="${this.fmtInput(this.currentFlock.revenue, 2)}" min="0" max="99999999" step="0.01" inputmode="decimal">
                   </div>
                   <div>
                     <label>Total Feed Used (lbs)</label>
-                    <input type="number" name="feedLbs" value="${this.fmtInput(this.currentFlock.feedLbs)}" min="0" max="999999999" step="0.1" inputmode="decimal">
+                    <input type="number" name="feedLbs" value="${this.fmtInput(this.currentFlock.feedLbs, 2)}" min="0" max="999999999" step="0.01" inputmode="decimal">
                   </div>
                 </div>
               </div>
@@ -7159,121 +7163,121 @@
                   ${this.settings.showFeed ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.feedLabel)}</label>
-                      <input type="number" name="fCost" value="${this.fmtInput(this.currentFlock.fCost)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="fCost" value="${this.fmtInput(this.currentFlock.fCost, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showPoult ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.poultLabel)}</label>
-                      <input type="number" name="pCost" value="${this.fmtInput(this.currentFlock.pCost)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="pCost" value="${this.fmtInput(this.currentFlock.pCost, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showClean ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.cleanLabel)}</label>
-                      <input type="number" name="clean" value="${this.fmtInput(this.currentFlock.clean)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="clean" value="${this.fmtInput(this.currentFlock.clean, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showCoal ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.coalLabel)}</label>
-                      <input type="number" name="coal" value="${this.fmtInput(this.currentFlock.coal)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="coal" value="${this.fmtInput(this.currentFlock.coal, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showDep ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.depLabel)}</label>
-                      <input type="number" name="depreciation" value="${this.fmtInput(this.currentFlock.depreciation)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="depreciation" value="${this.fmtInput(this.currentFlock.depreciation, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showElectric ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.electricLabel)}</label>
-                      <input type="number" name="electric" value="${this.fmtInput(this.currentFlock.electric)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="electric" value="${this.fmtInput(this.currentFlock.electric, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showEquip ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.equipLabel)}</label>
-                      <input type="number" name="equip" value="${this.fmtInput(this.currentFlock.equip)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="equip" value="${this.fmtInput(this.currentFlock.equip, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showFuel ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.fuelLabel)}</label>
-                      <input type="number" name="fuel" value="${this.fmtInput(this.currentFlock.fuel)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="fuel" value="${this.fmtInput(this.currentFlock.fuel, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showLabor ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.laborLabel)}</label>
-                      <input type="number" name="labor" value="${this.fmtInput(this.currentFlock.labor)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="labor" value="${this.fmtInput(this.currentFlock.labor, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showMeds ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.medsLabel)}</label>
-                      <input type="number" name="meds" value="${this.fmtInput(this.currentFlock.meds)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="meds" value="${this.fmtInput(this.currentFlock.meds, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showGas ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.gasLabel)}</label>
-                      <input type="number" name="gas" value="${this.fmtInput(this.currentFlock.gas)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="gas" value="${this.fmtInput(this.currentFlock.gas, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showPest ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.pestLabel)}</label>
-                      <input type="number" name="pest" value="${this.fmtInput(this.currentFlock.pest)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="pest" value="${this.fmtInput(this.currentFlock.pest, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showRepairs ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.repairsLabel)}</label>
-                      <input type="number" name="repairs" value="${this.fmtInput(this.currentFlock.repairs)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="repairs" value="${this.fmtInput(this.currentFlock.repairs, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showShavings ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.shavingsLabel)}</label>
-                      <input type="number" name="shavings" value="${this.fmtInput(this.currentFlock.shavings)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="shavings" value="${this.fmtInput(this.currentFlock.shavings, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showLoading ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.loadingLabel)}</label>
-                      <input type="number" name="loading" value="${this.fmtInput(this.currentFlock.loading)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="loading" value="${this.fmtInput(this.currentFlock.loading, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showWater ? `
                     <div class="money-group">
                       <label>${this.escapeHtml(this.settings.waterLabel)}</label>
-                      <input type="number" name="water" value="${this.fmtInput(this.currentFlock.water)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="water" value="${this.fmtInput(this.currentFlock.water, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showMisc1 ? `
                     <div class="money-group">
                       <label>${this.settings.misc1Label}</label>
-                      <input type="number" name="misc1" value="${this.fmtInput(this.currentFlock.misc1)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="misc1" value="${this.fmtInput(this.currentFlock.misc1, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showMisc2 ? `
                     <div class="money-group">
                       <label>${this.settings.misc2Label}</label>
-                      <input type="number" name="misc2" value="${this.fmtInput(this.currentFlock.misc2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="misc2" value="${this.fmtInput(this.currentFlock.misc2, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showMisc3 ? `
                     <div class="money-group">
                       <label>${this.settings.misc3Label}</label>
-                      <input type="number" name="misc3" value="${this.fmtInput(this.currentFlock.misc3)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="misc3" value="${this.fmtInput(this.currentFlock.misc3, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   ${this.settings.showMisc4 ? `
                     <div class="money-group">
                       <label>${this.settings.misc4Label}</label>
-                      <input type="number" name="misc4" value="${this.fmtInput(this.currentFlock.misc4)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+                      <input type="number" name="misc4" value="${this.fmtInput(this.currentFlock.misc4, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
                     </div>
                   ` : ''}
                   <div class="money-group" style="background:#1a3a1a;border:1px solid #2a5a2a;padding:12px;border-radius:8px;">
