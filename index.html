@@ -5934,9 +5934,10 @@
       fmtInput(val, decimals = null) {
         if (val === 0 || !val) return '';
         // Don't add commas - number inputs reject them!
-        // If decimals specified, format to that many decimal places
+        // If decimals specified, truncate (don't round) to that many decimal places
         if (decimals !== null) {
-          return Number(val).toFixed(decimals);
+          const multiplier = Math.pow(10, decimals);
+          return (Math.floor(Number(val) * multiplier) / multiplier).toFixed(decimals);
         }
         // Just return the plain number
         return val;
@@ -7053,7 +7054,7 @@
               <div class="metric-grid">
                 <div class="metric-item">
                   <div class="metric-label">ADG</div>
-                  <div class="metric-value">${metrics.adg.toFixed(3)}</div>
+                  <div class="metric-value">${(Math.floor(metrics.adg * 10000) / 10000).toFixed(4)}</div>
                 </div>
                 <div class="metric-item">
                   <div class="metric-label">Age</div>
@@ -7085,7 +7086,7 @@
                 </div>
                 <div class="metric-item">
                   <div class="metric-label">Paid per lb</div>
-                  <div class="metric-value">${this.currentFlock.pricePerLb.toFixed(4)}</div>
+                  <div class="metric-value">${(Math.floor(this.currentFlock.pricePerLb * 10000) / 10000).toFixed(4)}</div>
                 </div>
               </div>
             </div>
@@ -7974,7 +7975,7 @@
                 <div class="metric-grid">
                   <div class="metric-item">
                     <div class="metric-label">ADG</div>
-                    <div class="metric-value">${summary.adg.toFixed(3)}</div>
+                    <div class="metric-value">${(Math.floor(summary.adg * 10000) / 10000).toFixed(4)}</div>
                   </div>
                   <div class="metric-item">
                     <div class="metric-label">Age</div>
