@@ -355,6 +355,25 @@
       touch-action: pan-x pan-y pinch-zoom; /* Allow pan in both directions plus pinch zoom */
     }
     
+    /* Solid black padding bar for iPhone camera/notch on mobile */
+    @media (max-width: 768px) {
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 25px;
+        background: #000000;
+        z-index: 9999;
+        pointer-events: none;
+      }
+      
+      #app {
+        padding-top: 25px;
+      }
+    }
+    
     /* Main container to handle scrolling */
     #app {
       height: 100vh;
