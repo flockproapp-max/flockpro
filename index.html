@@ -353,9 +353,6 @@
       width: 100%;
       overflow: hidden;
       touch-action: pan-x pan-y pinch-zoom; /* Allow pan in both directions plus pinch zoom */
-      /* iPhone notch/camera safe area padding */
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
     }
     
     /* Main container to handle scrolling */
@@ -366,16 +363,6 @@
       overscroll-behavior-y: contain; /* Only prevent pull-to-refresh, allow horizontal pan */
       overscroll-behavior-x: auto; /* Allow horizontal scroll when zoomed */
       -webkit-overflow-scrolling: touch;
-      /* Additional padding for mobile devices to push content down */
-      padding-top: 10px;
-    }
-    
-    /* Mobile-specific adjustments for iPhone */
-    @media (max-width: 768px) {
-      #app {
-        /* Combine env() safe area with additional padding on mobile */
-        padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
-      }
     }
     
     /* Custom Scrollbar */
@@ -2745,8 +2732,6 @@
       /* Navigation */
       .top-nav {
         padding: 12px 16px;
-        /* Add safe area padding for iPhone notch/camera */
-        padding-top: calc(12px + env(safe-area-inset-top, 0px));
       }
       
       .nav-brand {
