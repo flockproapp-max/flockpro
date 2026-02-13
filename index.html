@@ -367,14 +367,14 @@
       overscroll-behavior-x: auto; /* Allow horizontal scroll when zoomed */
       -webkit-overflow-scrolling: touch;
       /* Additional padding for mobile devices to push content down */
-      padding-top: 20px;
+      padding-top: 10px;
     }
     
     /* Mobile-specific adjustments for iPhone */
     @media (max-width: 768px) {
       #app {
         /* Combine env() safe area with additional padding on mobile */
-        padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+        padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
       }
     }
     
