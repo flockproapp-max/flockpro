@@ -5933,13 +5933,7 @@
 
       fmtInput(val, decimals = null) {
         if (val === 0 || !val) return '';
-        // Don't add commas - number inputs reject them!
-        // If decimals specified, truncate (don't round) to that many decimal places
-        if (decimals !== null) {
-          const multiplier = Math.pow(10, decimals);
-          return Math.floor(Number(val) * multiplier) / multiplier;
-        }
-        // Just return the plain number
+        // Just return the exact value - no rounding, no truncating
         return val;
       }
 
@@ -7086,7 +7080,7 @@
                 </div>
                 <div class="metric-item">
                   <div class="metric-label">Paid per lb</div>
-                  <div class="metric-value">${(Math.floor(this.currentFlock.pricePerLb * 10000) / 10000).toFixed(4)}</div>
+                  <div class="metric-value">${this.currentFlock.pricePerLb}</div>
                 </div>
               </div>
             </div>
