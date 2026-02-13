@@ -2430,11 +2430,19 @@
     
     .money-group {
       position: relative;
+      display: flex;
+      flex-direction: column;
     }
     
     .money-group label {
       display: block;
       margin-bottom: 4px;
+      min-height: 2.4em; /* Reserve space for 2 lines to keep inputs aligned */
+      line-height: 1.2em;
+    }
+    
+    .money-group input {
+      margin-top: auto; /* Push input to bottom of container */
     }
     
     /* Buttons */
