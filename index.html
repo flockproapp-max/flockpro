@@ -353,6 +353,10 @@
       width: 100%;
       overflow: hidden;
       touch-action: pan-x pan-y pinch-zoom; /* Allow pan in both directions plus pinch zoom */
+      /* Prevent iOS Safari from auto-shrinking text */
+      -webkit-text-size-adjust: 100%;
+      -moz-text-size-adjust: 100%;
+      text-size-adjust: 100%;
     }
     
     /* Solid black padding bar for iPhone camera/notch ONLY */
