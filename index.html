@@ -6387,7 +6387,7 @@
 
       fmtInput(val, decimals = null) {
         if (val === 0 || !val) return '';
-        // Just return the exact value - no rounding, no truncating
+        if (decimals !== null) return parseFloat(val).toFixed(decimals);
         return val;
       }
 
@@ -7634,7 +7634,7 @@
                 </div>
                 <div class="metric-item">
                   <div class="metric-label">Paid per lb</div>
-                  <div class="metric-value">${this.currentFlock.pricePerLb}</div>
+                  <div class="metric-value">${this.currentFlock.pricePerLb ? parseFloat(this.currentFlock.pricePerLb).toFixed(4) : 0}</div>
                 </div>
               </div>
             </div>
