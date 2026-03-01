@@ -9532,7 +9532,6 @@
       }
 
       renderExpenseBreakdown(summary) {
-        const expSubs = this.settings.expSubs || {};
         const expDefs = [
           { show: 'showFeed', label: 'feedLabel', key: 'Feed', total: 'totalFeedCost' },
           { show: 'showPoult', label: 'poultLabel', key: 'Poult', total: 'totalPoultCost' },
@@ -9559,13 +9558,8 @@
         expDefs.forEach(def => {
           const val = summary[def.total] || 0;
           if (!this.settings[def.show] || val === 0) return;
+          // Show parent total only — sub-items stay inside the arrow box on the flock form
           expenses.push({ label: this.settings[def.label], value: val });
-          // Add active sub-items
-          const subs = (expSubs[def.key] || []).filter(s => s.active !== false);
-          subs.forEach((sub, i) => {
-            const subVal = (summary.expSubTotals[def.key] || {})[i] || 0;
-            if (subVal > 0) expenses.push({ label: '  ↳ ' + sub.label, value: subVal, isSub: true });
-          });
         });
 
         return expenses.map((exp, idx) => `
