@@ -1,9 +1,32 @@
 <!DOCTYPE html>
+<!--
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║                        COPYRIGHT NOTICE                             ║
+  ║                                                                      ║
+  ║  © 2026 Brian Glanzer. All Rights Reserved.                   ║
+  ║                                                                      ║
+  ║  FlockPro - Professional Poultry Management System                  ║
+  ║  Proprietary software. ║
+  ║                                                                      ║
+  ║  This software and its source code are the exclusive property of    ║
+  ║  Brian Glanzer. Unauthorized copying, reproduction,           ║
+  ║  modification, distribution, or use of this software, in whole or   ║
+  ║  in part, is strictly prohibited without express written permission  ║
+  ║  from Brian Glanzer.                                           ║
+  ║                                                                      ║
+  ║  Fingerprint: FP-FlockPro-2026-BG-FLOCK-MGT-001                    ║
+  ║  Registered work — original authorship documented.                  ║
+  ║                                                                      ║
+  ║  US COPYRIGHT REGISTRATION: v2.3.1                                  ║
+  ║  Case #: 1-15109743061 | Registered: 02/28/2026                     ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+-->
 <html lang="en">
 <!--
   ╔═══════════════════════════════════════════════════════════════╗
   ║              FlockPro v2.1 - SINGLE FILE EDITION              ║
   ║              Professional Poultry Management System           ║
+  ║        © 2026 Brian Glanzer. All Rights Reserved.       ║
   ╚═══════════════════════════════════════════════════════════════╝
 
   ⚠️⚠️⚠️ IMPORTANT - WHEN UPDATING THIS APP ⚠️⚠️⚠️
@@ -13,8 +36,8 @@
   
   1. Search for "this.appVersion" in this file (around line ~4000)
   2. INCREMENT THE VERSION NUMBER:
-     - Current: '2.1.1'
-     - Next update: '2.1.2'
+     - Current: '2.1.2'
+     - Next update: '2.1.3'
      - Then: '2.1.3', etc.
   
   3. This triggers the automatic "New Update Available" banner
@@ -41,12 +64,10 @@
      - Status: Fully protecting all Firebase API requests
   
   ✅ Firestore Security Rules: PUBLISHED & ACTIVE
-     - Date Published: February 8, 2026
-     - Rule Level: PERMISSIVE (for testing - allows all authenticated reads/writes)
-     - Current Rules: Allow read/write if request.auth != null
+     - Date Published: February 28, 2026
+     - Rule Level: STRICT (per-user data isolation, admin-only admin collections)
+     - Current Rules: Users restricted to own data; suspension enforced; default deny
      - Location: Firebase Console > Firestore Database > Rules
-     - Note: Rules are temporarily permissive for initial testing
-     - TODO: Implement strict per-user rules before production launch
   
   ✅ Firebase API Key Status: PROTECTED
      - API Key visible in code: YES (line ~3383 - this is normal for web apps)
@@ -74,7 +95,7 @@
   📋 COMPLETE SECURITY VERIFICATION CHECKLIST:
   ✅ Firebase App Check enabled with reCAPTCHA v3
   ✅ App Check SDK integrated into code (line ~3395-3397)
-  ✅ Firestore security rules published (permissive for testing)
+  ✅ Firestore security rules published (strict per-user isolation)
   ✅ reCAPTCHA v3 site created and configured
   ✅ reCAPTCHA domain authorized (flockproapp-max.github.io)
   ✅ Secret key added to Firebase App Check
@@ -94,11 +115,11 @@
   
   ⚠️  IMPORTANT NOTES FOR FUTURE REFERENCE:
   
-  1. FIRESTORE RULES - CURRENTLY PERMISSIVE:
-     - Current rules allow ANY authenticated user to read/write ANY document
-     - This was set for initial testing to verify App Check works
-     - BEFORE PRODUCTION: Update rules to restrict users to their own data only
-     - Recommended: Implement per-user data isolation rules
+  1. FIRESTORE RULES - STRICT & ACTIVE:
+     - Rules restrict each user to their own data only
+     - Account suspension enforced on all writes
+     - Admin collections protected to admin email only
+     - Default deny on all unmatched paths
   
   2. APP CHECK IS WORKING:
      - Successfully generates reCAPTCHA v3 tokens
@@ -106,21 +127,18 @@
      - Domain flockproapp-max.github.io is authorized
      - Tokens auto-refresh every 1 day
   
-  3. TESTING HISTORY:
+  3. DEPLOYMENT HISTORY:
      - Initial deployment had missing App Check SDK - FIXED
      - First reCAPTCHA key was incorrect - FIXED
      - Second reCAPTCHA key was from wrong site - FIXED
      - Created dedicated "FlockPro" reCAPTCHA v3 site - SUCCESS
-     - Firestore rules were blocking pre-auth requests - FIXED
-     - Simplified rules to permissive mode for testing - SUCCESS
-     - App now loads and works correctly - VERIFIED
+     - Firestore rules tightened to strict per-user isolation - COMPLETE
+     - App loads and works correctly - VERIFIED
   
-  4. NEXT STEPS FOR PRODUCTION:
-     - Test all app features thoroughly
-     - Tighten Firestore rules to per-user data isolation
+  4. MAINTENANCE:
      - Monitor Firebase usage in console for unusual activity
-     - Consider adding rate limiting if needed
      - Keep Firebase SDK versions updated
+     - Consider adding rate limiting if needed
   
   ⚠️  MAINTENANCE NOTES:
   - If you see unusual Firebase usage, check console.firebase.google.com/project/turkey-tracker-23a04/usage
@@ -131,13 +149,12 @@
   - Firebase App Check: https://console.firebase.google.com/project/turkey-tracker-23a04/appcheck
   - Firestore Rules: https://console.firebase.google.com/project/turkey-tracker-23a04/firestore/rules
   
-  🔐 PRODUCTION FIRESTORE RULES (TO IMPLEMENT LATER):
-  Located at bottom of this file (lines ~9100+) - comprehensive rules that:
-  - Restrict users to only their own data
-  - Check account suspension status
-  - Support invite-only mode
-  - Protect admin collections
-  - Currently NOT active (permissive rules active instead)
+  🔐 FIRESTORE RULES: ACTIVE & STRICT
+  - Per-user data isolation enforced
+  - Account suspension enforced on writes
+  - Invite-only mode supported
+  - Admin collections protected
+  - Default deny on all unmatched paths
   
   ════════════════════════════════════════════════════════════════
   
@@ -218,7 +235,7 @@
   
   Original Release: v1.10 - Account Suspension Support
   Date: February 5, 2026
-  Author: Fordham Turkey Farm
+  Author: Brian Glanzer / 
   
   NEW IN v1.10:
   - 🚫 Account suspension support (admin can block login)
@@ -293,6 +310,13 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="Professional poultry management with real-time analytics and performance tracking">
   <meta name="theme-color" content="#22c55e">
+  <!-- Ownership & Copyright -->
+  <meta name="author" content="Brian Glanzer">
+  <meta name="copyright" content="© 2026 Brian Glanzer. All Rights Reserved.">
+  <meta name="owner" content="Brian Glanzer, ">
+  <meta name="application-name" content="FlockPro">
+  <meta name="created" content="2024">
+  <meta name="rights" content="Proprietary software. Unauthorized copying or distribution is strictly prohibited.">
   <title>FlockPro v2.1 - Professional Farm Management</title>
   
   <!-- PWA Manifest -->
@@ -4546,6 +4570,16 @@
         // ⚠️ Change 2.1.2 → 2.1.3 → 2.1.4, etc. whenever you push changes to GitHub
         // ⚠️ This triggers the "New Update Available" banner for users
         this.appVersion = '2.3.1'; // <-- CHANGE THIS NUMBER WHEN YOU UPDATE!
+        // © 2026 Brian Glanzer. FlockPro is proprietary software.
+        // ⚖️ COPYRIGHT REGISTRATION: v2.3.1 registered with US Copyright Office on 02/28/2026
+        //    Case #: 1-15109743061 | Re-register on major version updates.
+        // Original author fingerprint — do not remove.
+        // Creation chain: Brian Glanzer > FlockPro > FP-2026-FLOCK-MGT-001
+        this._appSignature = 'FP-FlockPro-2026-' + btoa('FlockPro:BrianGlanzer:Original').replace(/=/g,'');
+        this._appCreated = '2024-01-01';
+        this._appAuthor = 'Brian Glanzer';
+        this._appOwner = '';
+        this._appFingerprint = 'FP-BG-FlockPro-2026-BG-001';
         this.updateCheckInterval = null; // Check for updates periodically
         this.updateAvailable = false; // Flag for update notification
         
@@ -4640,6 +4674,9 @@
           shavingsLabel: "Shavings & Trucking", laborLabel: "Labor",
           misc1Label: "Miscellaneous 1", misc2Label: "Miscellaneous 2",
           misc3Label: "Miscellaneous 3", misc4Label: "Miscellaneous 4",
+          // Sub-expenses per expense key (dynamic, user-defined)
+          expSubs: {},
+          anthropicApiKey: '',
           enableImageUpload: false, // Image upload disabled by default for privacy
           imgbbApiKey: "", // User must add their own API key for privacy
           autoBackupEnabled: false, // Auto-backup disabled by default
@@ -5399,7 +5436,6 @@
                 email: user.email  // Also ensure email is stored for admin panel
               }, { merge: true });
               
-              console.log('✓ Last login updated:', new Date());
             } catch (error) {
               console.error('Error updating last login:', error);
               // Don't block login if this fails - just log it
@@ -5811,6 +5847,8 @@
           fCost: 0, pCost: 0, meds: 0, clean: 0, pest: 0, water: 0,
           equip: 0, repairs: 0, electric: 0, gas: 0, coal: 0,
           loading: 0, shavings: 0, labor: 0, depreciation: 0, fuel: 0,
+          expSubAmounts: {},
+          expSubUnits: {},
           notes: '',
           images: []
         };
@@ -5915,7 +5953,6 @@
             this.render();
           }, error => {
             // Silently fail — don't block the app if this collection doesn't exist yet
-            console.log('Admin appSettings not found (normal if not yet created):', error.code);
           });
 
         // Real-time listener for announcements
@@ -5935,7 +5972,6 @@
             }
             this.render();
           }, error => {
-            console.log('Admin announcements not found (normal if not yet created):', error.code);
             this.announcements = [];
           });
       }
@@ -6516,8 +6552,8 @@
             break;
         }
         
-        // Add beta footer to all pages
-        // content += this.renderBetaFooter(); // REMOVED - beta info is on Home page
+        // Add copyright footer to all pages
+        content += this.renderBetaFooter();
 
         // If we're on the flock view, save any unsaved form data before wiping the DOM
         const savedFlockForm = {};
@@ -6722,6 +6758,20 @@
             </p>
             <p style="color: #666; font-size: 0.85em;">
               Free during testing • Advance notice before any pricing changes
+            </p>
+          </div>
+          ${this.renderCopyrightFooter()}
+        `;
+      }
+
+      renderCopyrightFooter() {
+        return `
+          <div style="padding: 16px 24px; text-align: center; border-top: 1px solid rgba(34,197,94,0.15); background: rgba(0,0,0,0.5);">
+            <p style="color: #333; font-size: 0.72em; letter-spacing: 0.04em; line-height: 1.8; margin: 0;">
+              © ${new Date().getFullYear()} <strong style="color:#444;">Brian Glanzer</strong>. All Rights Reserved.<br>
+              <span style="color:#2a2a2a;">FlockPro is proprietary software.</span><br>
+              <span style="color:#222;">Unauthorized copying, reproduction, modification or distribution is strictly prohibited.</span><br>
+              <span style="color:#1a1a1a; font-size:0.9em;">Fingerprint: FP-FlockPro-2026-BG-001 · Original authorship documented.</span>
             </p>
           </div>
         `;
@@ -7590,6 +7640,23 @@
             </div>
 
             <form id="flock-form" onsubmit="if(app.accountFrozen) { app.showToast('⚠️ Account Frozen: Cannot save changes', 'error'); return false; } return app.handleSaveFlock(event);">
+
+              <!-- Settlement Import -->
+              <div class="arduino-card" style="border-color:#22c55e33;">
+                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                  <div>
+                    <div style="font-weight:700; color:#22c55e; font-size:1em;">📄 Import Settlement Sheet</div>
+                    <div style="font-size:0.82em; color:#888; margin-top:2px;">Auto-fills flock data from a Dakota Provisions settlement (.xls or PDF)</div>
+                  </div>
+                  <button type="button" onclick="document.getElementById('settlement-pdf-input').click()"
+                    style="background:#1a3a2a; border:1px solid #22c55e; border-radius:8px; padding:8px 18px; cursor:pointer; color:#22c55e; font-size:0.95em; font-weight:600; white-space:nowrap;">
+                    📂 Choose PDF
+                  </button>
+                  <input type="file" id="settlement-pdf-input" accept=".xls,.xlsx,application/pdf" style="display:none"
+                    onchange="app.importSettlement(this)">
+                </div>
+              </div>
+
               <div class="arduino-card">
                 <h3>Revenue & Pricing</h3>
                 <div class="form-grid">
@@ -7672,128 +7739,34 @@
               </div>
 
               <div class="arduino-card">
-                <h3>Expenses</h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                  <h3 style="margin: 0;">Expenses</h3>
+                  <button type="button" onclick="app.navigate('expenseSettings')"
+                    style="background: #2a2a2a; border: 1px solid #444; border-radius: 6px; padding: 5px 12px; cursor: pointer; color: #1db954; font-size: 0.82em; display: flex; align-items: center; gap: 5px;">
+                    ⚙️ Edit Fields
+                  </button>
+                </div>
                 <div class="form-grid">
-                  ${this.settings.showFeed ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.feedLabel)}</label>
-                      <input type="number" name="fCost" value="${this.fmtInput(this.currentFlock.fCost, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showPoult ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.poultLabel)}</label>
-                      <input type="number" name="pCost" value="${this.fmtInput(this.currentFlock.pCost, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showClean ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.cleanLabel)}</label>
-                      <input type="number" name="clean" value="${this.fmtInput(this.currentFlock.clean, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showCoal ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.coalLabel)}</label>
-                      <input type="number" name="coal" value="${this.fmtInput(this.currentFlock.coal, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showDep ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.depLabel)}</label>
-                      <input type="number" name="depreciation" value="${this.fmtInput(this.currentFlock.depreciation, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showElectric ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.electricLabel)}</label>
-                      <input type="number" name="electric" value="${this.fmtInput(this.currentFlock.electric, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showEquip ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.equipLabel)}</label>
-                      <input type="number" name="equip" value="${this.fmtInput(this.currentFlock.equip, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showFuel ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.fuelLabel)}</label>
-                      <input type="number" name="fuel" value="${this.fmtInput(this.currentFlock.fuel, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showLabor ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.laborLabel)}</label>
-                      <input type="number" name="labor" value="${this.fmtInput(this.currentFlock.labor, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showMeds ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.medsLabel)}</label>
-                      <input type="number" name="meds" value="${this.fmtInput(this.currentFlock.meds, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showGas ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.gasLabel)}</label>
-                      <input type="number" name="gas" value="${this.fmtInput(this.currentFlock.gas, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showPest ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.pestLabel)}</label>
-                      <input type="number" name="pest" value="${this.fmtInput(this.currentFlock.pest, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showRepairs ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.repairsLabel)}</label>
-                      <input type="number" name="repairs" value="${this.fmtInput(this.currentFlock.repairs, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showShavings ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.shavingsLabel)}</label>
-                      <input type="number" name="shavings" value="${this.fmtInput(this.currentFlock.shavings, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showLoading ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.loadingLabel)}</label>
-                      <input type="number" name="loading" value="${this.fmtInput(this.currentFlock.loading, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showWater ? `
-                    <div class="money-group">
-                      <label>${this.escapeHtml(this.settings.waterLabel)}</label>
-                      <input type="number" name="water" value="${this.fmtInput(this.currentFlock.water, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showMisc1 ? `
-                    <div class="money-group">
-                      <label>${this.settings.misc1Label}</label>
-                      <input type="number" name="misc1" value="${this.fmtInput(this.currentFlock.misc1, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showMisc2 ? `
-                    <div class="money-group">
-                      <label>${this.settings.misc2Label}</label>
-                      <input type="number" name="misc2" value="${this.fmtInput(this.currentFlock.misc2, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showMisc3 ? `
-                    <div class="money-group">
-                      <label>${this.settings.misc3Label}</label>
-                      <input type="number" name="misc3" value="${this.fmtInput(this.currentFlock.misc3, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
-                  ${this.settings.showMisc4 ? `
-                    <div class="money-group">
-                      <label>${this.settings.misc4Label}</label>
-                      <input type="number" name="misc4" value="${this.fmtInput(this.currentFlock.misc4, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
-                    </div>
-                  ` : ''}
+                  ${this.settings.showFeed ? this.renderExpenseField('Feed','feedLabel','fCost') : ''}
+                  ${this.settings.showPoult ? this.renderExpenseField('Poult','poultLabel','pCost') : ''}
+                  ${this.settings.showClean ? this.renderExpenseField('Clean','cleanLabel','clean') : ''}
+                  ${this.settings.showCoal ? this.renderExpenseField('Coal','coalLabel','coal') : ''}
+                  ${this.settings.showDep ? this.renderExpenseField('Dep','depLabel','depreciation') : ''}
+                  ${this.settings.showElectric ? this.renderExpenseField('Electric','electricLabel','electric') : ''}
+                  ${this.settings.showEquip ? this.renderExpenseField('Equip','equipLabel','equip') : ''}
+                  ${this.settings.showFuel ? this.renderExpenseField('Fuel','fuelLabel','fuel') : ''}
+                  ${this.settings.showLabor ? this.renderExpenseField('Labor','laborLabel','labor') : ''}
+                  ${this.settings.showMeds ? this.renderExpenseField('Meds','medsLabel','meds') : ''}
+                  ${this.settings.showGas ? this.renderExpenseField('Gas','gasLabel','gas') : ''}
+                  ${this.settings.showPest ? this.renderExpenseField('Pest','pestLabel','pest') : ''}
+                  ${this.settings.showRepairs ? this.renderExpenseField('Repairs','repairsLabel','repairs') : ''}
+                  ${this.settings.showShavings ? this.renderExpenseField('Shavings','shavingsLabel','shavings') : ''}
+                  ${this.settings.showLoading ? this.renderExpenseField('Loading','loadingLabel','loading') : ''}
+                  ${this.settings.showWater ? this.renderExpenseField('Water','waterLabel','water') : ''}
+                  ${this.settings.showMisc1 ? this.renderExpenseField('Misc1','misc1Label','misc1') : ''}
+                  ${this.settings.showMisc2 ? this.renderExpenseField('Misc2','misc2Label','misc2') : ''}
+                  ${this.settings.showMisc3 ? this.renderExpenseField('Misc3','misc3Label','misc3') : ''}
+                  ${this.settings.showMisc4 ? this.renderExpenseField('Misc4','misc4Label','misc4') : ''}
                   <div class="money-group" style="background:#1a3a1a;border:1px solid #2a5a2a;padding:12px;border-radius:8px;">
                     <label><strong>Total Expenses</strong></label>
                     <span class="dollar-label">$</span>
@@ -7998,23 +7971,81 @@
 
               <div class="daily-log-field">
                 <label>🧪 Water Products &amp; Meds</label>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                  <div>
-                    <div style="font-size:0.75em; color:#888; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.05em;">Water Products</div>
-                    <input type="text" name="waterProducts" maxlength="300" placeholder="e.g. 3 gals of Cid 2000"
-                      style="width:100%; padding:10px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:8px; color:#fff; font-size:0.95em; box-sizing:border-box; margin-bottom:6px; height:44px;">
-                    <div style="font-size:0.75em; color:#888; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.05em;">Cost ($)</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+
+                  <!-- WATER PRODUCTS -->
+                  <div style="background:#111; border:1px solid #2a2a2a; border-radius:10px; padding:10px;">
+                    <div style="font-size:0.75em; color:#22c55e; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em; font-weight:600;">💧 Water Product</div>
+                    <div style="font-size:0.72em; color:#888; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.04em;">Product Name</div>
+                    <input type="text" name="waterProductName" maxlength="100" placeholder="e.g. Cid 2000"
+                      style="width:100%; padding:9px 10px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:7px; color:#fff; font-size:0.95em; box-sizing:border-box; margin-bottom:7px; height:40px;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:7px;">
+                      <div>
+                        <div style="font-size:0.72em; color:#888; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.04em;">Amount</div>
+                        <input type="number" name="waterProductAmt" min="0" step="0.01" placeholder="0" inputmode="decimal"
+                          style="width:100%; padding:9px 10px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:7px; color:#fff; font-size:0.95em; box-sizing:border-box; height:40px;">
+                      </div>
+                      <div>
+                        <div style="font-size:0.72em; color:#888; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.04em;">Unit</div>
+                        <select name="waterProductUnit"
+                          style="width:100%; padding:9px 10px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:7px; color:#fff; font-size:0.95em; box-sizing:border-box; height:40px;">
+                          <option value="gals">gals</option>
+                          <option value="oz">oz</option>
+                          <option value="lbs">lbs</option>
+                          <option value="qt">qt</option>
+                          <option value="tsp">tsp</option>
+                          <option value="tbsp">tbsp</option>
+                          <option value="ml">ml</option>
+                          <option value="cc">cc</option>
+                          <option value="packets">packets</option>
+                          <option value="doses">doses</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div style="font-size:0.72em; color:#888; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.04em;">Cost ($)</div>
                     <input type="number" name="waterProductsCost" min="0" step="0.01" placeholder="0.00" inputmode="decimal"
-                      style="width:100%; padding:10px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:8px; color:#fff; font-size:0.95em; box-sizing:border-box; height:44px;">
+                      style="width:100%; padding:9px 10px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:7px; color:#fff; font-size:0.95em; box-sizing:border-box; height:40px;">
+                    <!-- Hidden field assembles the legacy waterProducts string on submit -->
+                    <input type="hidden" name="waterProducts" id="waterProductsHidden">
                   </div>
-                  <div>
-                    <div style="font-size:0.75em; color:#888; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.05em;">Meds Used</div>
-                    <input type="text" name="medsUsed" maxlength="300" placeholder="e.g. Tylosin 200mg"
-                      style="width:100%; padding:10px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:8px; color:#fff; font-size:0.95em; box-sizing:border-box; margin-bottom:6px; height:44px;">
-                    <div style="font-size:0.75em; color:#888; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.05em;">Cost ($)</div>
+
+                  <!-- MEDS -->
+                  <div style="background:#111; border:1px solid #2a2a2a; border-radius:10px; padding:10px;">
+                    <div style="font-size:0.75em; color:#c084fc; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em; font-weight:600;">💊 Meds Used</div>
+                    <div style="font-size:0.72em; color:#888; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.04em;">Product Name</div>
+                    <input type="text" name="medName" maxlength="100" placeholder="e.g. Tylosin"
+                      style="width:100%; padding:9px 10px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:7px; color:#fff; font-size:0.95em; box-sizing:border-box; margin-bottom:7px; height:40px;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:7px;">
+                      <div>
+                        <div style="font-size:0.72em; color:#888; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.04em;">Amount</div>
+                        <input type="number" name="medAmt" min="0" step="0.01" placeholder="0" inputmode="decimal"
+                          style="width:100%; padding:9px 10px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:7px; color:#fff; font-size:0.95em; box-sizing:border-box; height:40px;">
+                      </div>
+                      <div>
+                        <div style="font-size:0.72em; color:#888; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.04em;">Unit</div>
+                        <select name="medUnit"
+                          style="width:100%; padding:9px 10px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:7px; color:#fff; font-size:0.95em; box-sizing:border-box; height:40px;">
+                          <option value="mg">mg</option>
+                          <option value="oz">oz</option>
+                          <option value="cc">cc</option>
+                          <option value="ml">ml</option>
+                          <option value="lbs">lbs</option>
+                          <option value="gals">gals</option>
+                          <option value="tsp">tsp</option>
+                          <option value="tbsp">tbsp</option>
+                          <option value="doses">doses</option>
+                          <option value="tablets">tablets</option>
+                          <option value="packets">packets</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div style="font-size:0.72em; color:#888; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.04em;">Cost ($)</div>
                     <input type="number" name="medsCost" min="0" step="0.01" placeholder="0.00" inputmode="decimal"
-                      style="width:100%; padding:10px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:8px; color:#fff; font-size:0.95em; box-sizing:border-box; height:44px;">
+                      style="width:100%; padding:9px 10px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:7px; color:#fff; font-size:0.95em; box-sizing:border-box; height:40px;">
+                    <!-- Hidden field assembles the legacy medsUsed string on submit -->
+                    <input type="hidden" name="medsUsed" id="medsUsedHidden">
                   </div>
+
                 </div>
               </div>
 
@@ -8318,14 +8349,28 @@
         }
         const form = event.target;
         const data = new FormData(form);
+        const waterName = this.sanitizeInput((data.get('waterProductName') || '').trim());
+        const waterAmt  = parseFloat(data.get('waterProductAmt')) || 0;
+        const waterUnit = data.get('waterProductUnit') || 'gals';
+        const waterProductsStr = waterName
+          ? (waterAmt > 0 ? `${waterAmt} ${waterUnit} of ${waterName}` : waterName)
+          : '';
+
+        const medName = this.sanitizeInput((data.get('medName') || '').trim());
+        const medAmt  = parseFloat(data.get('medAmt')) || 0;
+        const medUnit = data.get('medUnit') || 'mg';
+        const medsUsedStr = medName
+          ? (medAmt > 0 ? `${medAmt} ${medUnit} of ${medName}` : medName)
+          : '';
+
         const entry = {
           date: data.get('date') || new Date().toISOString().split('T')[0],
           deaths: parseInt(data.get('deaths')) || 0,
           culls: parseInt(data.get('culls')) || 0,
           waterGallons: parseFloat(data.get('waterGallons')) || 0,
-          waterProducts: this.sanitizeInput((data.get('waterProducts') || '').slice(0, 300)),
+          waterProducts: waterProductsStr,
           waterProductsCost: parseFloat(data.get('waterProductsCost')) || 0,
-          medsUsed: this.sanitizeInput((data.get('medsUsed') || '').slice(0, 300)),
+          medsUsed: medsUsedStr,
           medsCost: parseFloat(data.get('medsCost')) || 0,
           savedAt: new Date().toISOString()
         };
@@ -8384,6 +8429,10 @@
           this.currentFlock.shipped = birdsLeft;
           this.currentFlock.water = newWater;
           this.currentFlock.meds = newMeds;
+
+          // Auto-create/update Water and Meds sub-fields from daily log entries
+          await this.syncProductSubFields();
+
           form.reset();
           form.querySelector('[name="date"]').value = new Date().toISOString().split('T')[0];
           this.render();
@@ -8413,11 +8462,133 @@
           this.currentFlock.water = newWater;
           this.currentFlock.meds = newMeds;
 
+          await this.syncProductSubFields();
+
           this.showToast('Entry deleted');
           this.render();
         } catch (e) {
           this.showToast('Failed to delete: ' + e.message, 'error');
         }
+      }
+
+      // Parse a product name from text.
+      // New format: "3 gals of Cid 2000" → "Cid 2000"
+      // Legacy free text: "3 gals of Cid 2000" → same result
+      parseProductName(text) {
+        if (!text || !text.trim()) return null;
+        // Strip leading quantity + units + "of/of the" patterns
+        let cleaned = text.trim()
+          .replace(/^\d+(\.\d+)?\s*(gals?|gallons?|oz\.?|ounces?|lbs?|pounds?|ml|cc|tsp|tbsp|quarts?|qt\.?|pints?|pt\.?|doses?|packets?|bags?|tabs?|tablets?|pills?|capsules?|caps?|mg)\s*(of\s+(the\s+)?)?/i, '')
+          .replace(/^(of\s+(the\s+)?)/i, '')
+          .trim();
+        if (!cleaned || /^\d+$/.test(cleaned)) return text.trim();
+        return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+      }
+
+      // Sync Water and Meds sub-fields from all daily log entries for the current flock
+      async syncProductSubFields() {
+        if (!this.settings) return;
+        if (!this.settings.expSubs) this.settings.expSubs = {};
+
+        // Tally costs AND quantities per product across all daily logs
+        const waterTotals = {}; // { productName: { cost, qty, unit } }
+        const medsTotals  = {};
+
+        // Helper to parse qty+unit from a log entry string like "4 gals of Cid 2000"
+        const parseQtyUnit = (text) => {
+          const m = text.trim().match(/^(\d+(\.\d+)?)\s*(gals?|gallons?|oz\.?|ounces?|lbs?|pounds?|ml|cc|tsp|tbsp|quarts?|qt\.?|pints?|pt\.?|doses?|packets?|bags?|tabs?|tablets?|pills?|capsules?|caps?|mg)\s*/i);
+          if (m) return { qty: parseFloat(m[1]), unit: m[3].replace(/s$/i, '').toLowerCase() };
+          return null;
+        };
+
+        for (const log of this.dailyLogs) {
+          if (log.waterProducts && log.waterProducts.trim()) {
+            const entries = log.waterProducts.split('|').map(s => s.trim()).filter(Boolean);
+            const costs   = log.waterProductsCost || 0;
+            const perCost = entries.length > 0 ? costs / entries.length : 0;
+            entries.forEach(entry => {
+              const name = this.parseProductName(entry);
+              if (!name) return;
+              if (!waterTotals[name]) waterTotals[name] = { cost: 0, qty: 0, unit: '' };
+              waterTotals[name].cost = Math.round((waterTotals[name].cost + perCost) * 100) / 100;
+              const qu = parseQtyUnit(entry);
+              if (qu) { waterTotals[name].qty = Math.round((waterTotals[name].qty + qu.qty) * 100) / 100; waterTotals[name].unit = qu.unit; }
+            });
+          }
+          if (log.medsUsed && log.medsUsed.trim()) {
+            const entries = log.medsUsed.split('|').map(s => s.trim()).filter(Boolean);
+            const costs   = log.medsCost || 0;
+            const perCost = entries.length > 0 ? costs / entries.length : 0;
+            entries.forEach(entry => {
+              const name = this.parseProductName(entry);
+              if (!name) return;
+              if (!medsTotals[name]) medsTotals[name] = { cost: 0, qty: 0, unit: '' };
+              medsTotals[name].cost = Math.round((medsTotals[name].cost + perCost) * 100) / 100;
+              const qu = parseQtyUnit(entry);
+              if (qu) { medsTotals[name].qty = Math.round((medsTotals[name].qty + qu.qty) * 100) / 100; medsTotals[name].unit = qu.unit; }
+            });
+          }
+        }
+
+        let settingsChanged = false;
+
+        // Merge product names into expSubs (sub-field labels)
+        ['Water', 'Meds'].forEach(key => {
+          const totals = key === 'Water' ? waterTotals : medsTotals;
+          const productNames = Object.keys(totals);
+          if (!productNames.length) return;
+          const existing = this.settings.expSubs[key] || [];
+          productNames.forEach(name => {
+            const idx = existing.findIndex(s => s.label.toLowerCase() === name.toLowerCase());
+            if (idx === -1) {
+              existing.push({ label: name, active: true, autoAdded: true });
+              settingsChanged = true;
+            }
+          });
+          this.settings.expSubs[key] = existing;
+        });
+
+        // Update expSubAmounts and expSubQty on the flock
+        if (!this.currentFlock.expSubAmounts) this.currentFlock.expSubAmounts = {};
+        if (!this.currentFlock.expSubQty) this.currentFlock.expSubQty = {};
+
+        ['Water', 'Meds'].forEach(key => {
+          const totals = key === 'Water' ? waterTotals : medsTotals;
+          const subs = (this.settings.expSubs[key] || []).filter(s => s.active !== false);
+          if (!subs.length) return;
+          const amounts = {};
+          const qtys = {};
+          subs.forEach((sub, i) => {
+            const matchKey = Object.keys(totals).find(k => k.toLowerCase() === sub.label.toLowerCase());
+            if (matchKey) {
+              amounts[i] = totals[matchKey].cost;
+              qtys[i] = totals[matchKey].qty > 0 ? `${totals[matchKey].qty} ${totals[matchKey].unit}` : '';
+            } else {
+              amounts[i] = 0;
+              qtys[i] = '';
+            }
+          });
+          this.currentFlock.expSubAmounts[key] = amounts;
+          this.currentFlock.expSubQty[key] = qtys;
+        });
+
+        // Save settings silently if new sub-fields were added
+        if (settingsChanged) {
+          try {
+            await db.collection('users').doc(this.user.uid).update({ settings: this.settings });
+          } catch (e) {
+            try {
+              await db.collection('users').doc(this.user.uid).set({ settings: this.settings }, { merge: true });
+            } catch (e2) { /* silent fail */ }
+          }
+        }
+
+        // Save updated expSubAmounts back to the flock document
+        try {
+          await db.collection('users').doc(this.user.uid)
+            .collection('flocks').doc(this.currentFlock.docId)
+            .update({ expSubAmounts: this.currentFlock.expSubAmounts, expSubQty: this.currentFlock.expSubQty });
+        } catch (e) { /* silent fail */ }
       }
 
       editDailyLog(logId) {
@@ -8832,8 +9003,8 @@
       }
 
       renderCompare() {
-        const availableFlocks = this.flocks.filter(f => f.shipped > 0); // Only shipped flocks for fair comparison
-        
+        const availableFlocks = this.flocks.filter(f => f.shipped > 0);
+
         if (availableFlocks.length === 0) {
           return `
             <div class="container">
@@ -8845,6 +9016,155 @@
           `;
         }
 
+        if (!this.compareMode) this.compareMode = 'flocks';
+        const mode = this.compareMode;
+        const isLight = document.body.classList.contains('light-mode');
+        const tabStyle = (active) => `padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9em; font-weight: ${active ? '700' : '400'}; background: ${active ? '#1db954' : (isLight ? '#e5e7eb' : '#2a2a2a')}; color: ${active ? '#fff' : (isLight ? '#374151' : '#aaa')};`;
+
+        const tabs = `
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+            <button style="${tabStyle(mode==='flocks')}" onclick="app.compareMode='flocks'; app.render()">🐔 Flocks</button>
+            <button style="${tabStyle(mode==='barn')}" onclick="app.compareMode='barn'; app.render()">🏠 Barn</button>
+            <button style="${tabStyle(mode==='hatchery')}" onclick="app.compareMode='hatchery'; app.render()">🥚 Hatchery</button>
+            <button style="${tabStyle(mode==='breed')}" onclick="app.compareMode='breed'; app.render()">🐣 Breed</button>
+          </div>
+        `;
+
+        // ── GROUP COMPARE MODES ──────────────────────────────────────────
+        if (mode !== 'flocks') {
+          const fieldMap = { barn: 'barn', hatchery: 'hatchery', breed: 'poultSupplier' };
+          const field = fieldMap[mode];
+          const labelMap = { barn: 'Barn', hatchery: 'Hatchery', breed: 'Breed' };
+
+          // Group flocks by field value
+          const groups = {};
+          availableFlocks.forEach(f => {
+            const key = (f[field] || '').trim() || '(Not Set)';
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(f);
+          });
+
+          const groupKeys = Object.keys(groups);
+          if (groupKeys.length < 2) {
+            return `
+              <div class="container">
+                <div class="modern-card">
+                  <h3>Compare by ${labelMap[mode]}</h3>
+                  ${tabs}
+                  <p style="color: #888; text-align: center; padding: 30px 0;">
+                    Need at least 2 different ${labelMap[mode].toLowerCase()} values across your flocks to compare.
+                  </p>
+                </div>
+              </div>
+            `;
+          }
+
+          // Calculate averaged metrics per group
+          const groupMetrics = groupKeys.map(key => {
+            const gFlocks = groups[key];
+            const count = gFlocks.length;
+            const totals = gFlocks.reduce((acc, f) => {
+              const m = this.calculateMetrics(f);
+              acc.profit += m.profit || 0;
+              acc.profitPerBird += m.profitPerBird || 0;
+              acc.profitPerSqFt += m.profitPerSqFt || 0;
+              acc.revenue += f.revenue || 0;
+              acc.totalExp += m.totalExp || 0;
+              acc.livability += m.livability || 0;
+              acc.adg += m.adg || 0;
+              acc.fcr += (m.fcr > 0 ? m.fcr : 0);
+              acc.weight += f.weight || 0;
+              acc.placed += f.placed || 0;
+              acc.shipped += f.shipped || 0;
+              return acc;
+            }, { profit:0, profitPerBird:0, profitPerSqFt:0, revenue:0, totalExp:0, livability:0, adg:0, fcr:0, weight:0, placed:0, shipped:0 });
+
+            const fcrFlocks = gFlocks.filter(f => this.calculateMetrics(f).fcr > 0).length || 1;
+            return {
+              key,
+              count,
+              flockNums: gFlocks.map(f => '#' + f.id).join(', '),
+              profit: totals.profit / count,
+              profitPerBird: totals.profitPerBird / count,
+              profitPerSqFt: totals.profitPerSqFt / count,
+              revenue: totals.revenue / count,
+              totalExp: totals.totalExp / count,
+              livability: totals.livability / count,
+              adg: totals.adg / count,
+              fcr: totals.fcr / fcrFlocks,
+              weight: totals.weight / count,
+              placed: totals.placed / count,
+              shipped: totals.shipped / count,
+              totalProfit: totals.profit,
+            };
+          });
+
+          const best = (arr, fn, dir='high') => {
+            const vals = arr.map(fn);
+            const b = dir === 'high' ? Math.max(...vals) : Math.min(...vals.filter(v=>v>0));
+            return arr.findIndex((g,i) => fn(g) === b);
+          };
+
+          const renderGroupRow = (label, fn, dir='high', fmt='') => {
+            const vals = groupMetrics.map(fn);
+            const bestVal = dir === 'high' ? Math.max(...vals) : Math.min(...vals.filter(v=>v>0));
+            const bestIdx = vals.findIndex(v => v === bestVal);
+            return `
+              <tr style="border-bottom: 1px solid ${isLight?'#e5e7eb':'#333'};">
+                <td style="padding: 8px 6px; color: ${isLight?'#374151':'#ddd'}; font-size: 0.9em;">${label}</td>
+                ${groupMetrics.map((g, i) => {
+                  const val = fn(g);
+                  const display = fmt === '$' ? '$' + this.fmt(val)
+                    : fmt === '%' ? val.toFixed(2) + '%'
+                    : fmt === 'dec3' ? val.toFixed(3)
+                    : fmt === 'dec2' ? val.toFixed(2)
+                    : this.fmt(Math.round(val));
+                  const isBest = i === bestIdx;
+                  return `<td style="padding: 8px 6px; text-align: right; font-weight: ${isBest?'bold':'normal'}; color: ${isBest?'#22c55e':(isLight?'#1f2937':'#fff')}; font-size: 0.9em;">${display}${isBest?' 🏆':''}</td>`;
+                }).join('')}
+              </tr>`;
+          };
+
+          return `
+            <div class="container">
+              <div class="modern-card">
+                <h3>Compare by ${labelMap[mode]}</h3>
+                ${tabs}
+                <p style="color: #888; margin-bottom: 16px; font-size: 0.88em;">Averages across all flocks in each group. Flocks per group shown below.</p>
+                <div style="overflow-x: auto;">
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                      <tr style="border-bottom: 2px solid ${isLight?'#d1d5db':'#444'};">
+                        <th style="text-align: left; padding: 8px 6px; color: #22c55e; font-size: 0.9em;">Metric</th>
+                        ${groupMetrics.map(g => `
+                          <th style="text-align: right; padding: 8px 6px; font-size: 0.9em;">
+                            <div style="font-weight: 600; color: ${isLight?'#1f2937':'#fff'};">${this.escapeHtml(g.key)}</div>
+                            <div style="font-size: 0.78em; color: #888; font-weight: 400;">${g.count} flock${g.count>1?'s':''} · ${g.flockNums}</div>
+                          </th>
+                        `).join('')}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${renderGroupRow('🐣 Avg Birds Placed', g => g.placed, 'high', '')}
+                      ${renderGroupRow('🚚 Avg Birds Shipped', g => g.shipped, 'high', '')}
+                      ${renderGroupRow('💚 Avg Livability', g => g.livability, 'high', '%')}
+                      ${renderGroupRow('📏 Avg Weight (lbs)', g => g.weight, 'high', 'dec2')}
+                      ${renderGroupRow('📈 Avg ADG', g => g.adg, 'high', 'dec3')}
+                      ${renderGroupRow('🌾 Avg FCR', g => g.fcr, 'low', 'dec2')}
+                      ${renderGroupRow('💰 Avg Revenue', g => g.revenue, 'high', '$')}
+                      ${renderGroupRow('💸 Avg Expenses', g => g.totalExp, 'low', '$')}
+                      ${renderGroupRow('💵 Avg Profit/Flock', g => g.profit, 'high', '$')}
+                      ${renderGroupRow('🐦 Avg Profit/Bird', g => g.profitPerBird, 'high', '$')}
+                      ${renderGroupRow('📊 Total Profit All', g => g.totalProfit, 'high', '$')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        // ── INDIVIDUAL FLOCK COMPARE ─────────────────────────────────────
         const compareFlocks = this.compareFlockIds
           .map(id => this.flocks.find(f => f.docId === id))
           .filter(f => f);
@@ -8853,6 +9173,7 @@
           <div class="container">
             <div class="modern-card">
               <h3>Compare Flocks</h3>
+              ${tabs}
               <p style="color: #888; margin-bottom: 20px;">Select 2-3 flocks to compare their performance side-by-side</p>
 
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px;">
@@ -8860,7 +9181,7 @@
                   const isSelected = this.compareFlockIds.includes(flock.docId);
                   const canSelect = !isSelected && this.compareFlockIds.length < 3;
                   return `
-                    <button 
+                    <button
                       class="btn ${isSelected ? 'btn-primary' : 'btn-secondary'}"
                       onclick="app.toggleCompareSelection('${flock.docId}')"
                       ${!isSelected && !canSelect ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}
@@ -8884,12 +9205,14 @@
                 <div style="overflow-x: auto;">
                   <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
                     <thead>
-                      <tr style="border-bottom: 2px solid ${document.body.classList.contains('light-mode') ? '#d1d5db' : '#444'};">
+                      <tr style="border-bottom: 2px solid ${isLight ? '#d1d5db' : '#444'};">
                         <th style="text-align: left; padding: 8px 6px; color: #22c55e; font-size: 0.9em;">Metric</th>
                         ${compareFlocks.map(flock => `
                           <th style="text-align: right; padding: 8px 6px; font-size: 0.9em;">
-                            <div style="font-weight: 600; color: ${document.body.classList.contains('light-mode') ? '#1f2937' : '#fff'};">Flock #${this.escapeHtml(String(flock.id))}</div>
-                            ${flock.barn ? `<div style="font-size: 0.8em; color: ${document.body.classList.contains('light-mode') ? '#6b7280' : '#888'}; font-weight: 400;">${this.escapeHtml(flock.barn)}</div>` : ''}
+                            <div style="font-weight: 600; color: ${isLight ? '#1f2937' : '#fff'};">Flock #${this.escapeHtml(String(flock.id))}</div>
+                            ${flock.barn ? `<div style="font-size: 0.8em; color: ${isLight ? '#6b7280' : '#888'}; font-weight: 400;">${this.escapeHtml(flock.barn)}</div>` : ''}
+                            ${flock.hatchery ? `<div style="font-size: 0.75em; color: #666;">${this.escapeHtml(flock.hatchery)}</div>` : ''}
+                            ${flock.poultSupplier ? `<div style="font-size: 0.75em; color: #666;">${this.escapeHtml(flock.poultSupplier)}</div>` : ''}
                           </th>
                         `).join('')}
                       </tr>
@@ -8897,6 +9220,9 @@
                     <tbody>
                       ${this.renderComparisonRow('📅 Date Started', compareFlocks, f => f.startedDate || 'N/A')}
                       ${this.renderComparisonRow('📅 Date Shipped', compareFlocks, f => f.shippedDate || 'N/A')}
+                      ${this.renderComparisonRow('🏠 Barn', compareFlocks, f => f.barn || '—')}
+                      ${this.renderComparisonRow('🥚 Hatchery', compareFlocks, f => f.hatchery || '—')}
+                      ${this.renderComparisonRow('🐣 Breed', compareFlocks, f => f.poultSupplier || '—')}
                       ${this.renderComparisonRow('🐣 Birds Placed', compareFlocks, f => this.fmt(f.placed))}
                       ${this.renderComparisonRow('🚚 Birds Shipped', compareFlocks, f => this.fmt(f.shipped))}
                       ${this.renderComparisonRow('💚 Livability', compareFlocks, f => {
@@ -9206,44 +9532,46 @@
       }
 
       renderExpenseBreakdown(summary) {
+        const expSubs = this.settings.expSubs || {};
+        const expDefs = [
+          { show: 'showFeed', label: 'feedLabel', key: 'Feed', total: 'totalFeedCost' },
+          { show: 'showPoult', label: 'poultLabel', key: 'Poult', total: 'totalPoultCost' },
+          { show: 'showMeds', label: 'medsLabel', key: 'Meds', total: 'totalMeds' },
+          { show: 'showClean', label: 'cleanLabel', key: 'Clean', total: 'totalClean' },
+          { show: 'showPest', label: 'pestLabel', key: 'Pest', total: 'totalPest' },
+          { show: 'showWater', label: 'waterLabel', key: 'Water', total: 'totalWater' },
+          { show: 'showEquip', label: 'equipLabel', key: 'Equip', total: 'totalEquip' },
+          { show: 'showRepairs', label: 'repairsLabel', key: 'Repairs', total: 'totalRepairs' },
+          { show: 'showElectric', label: 'electricLabel', key: 'Electric', total: 'totalElectric' },
+          { show: 'showGas', label: 'gasLabel', key: 'Gas', total: 'totalGas' },
+          { show: 'showCoal', label: 'coalLabel', key: 'Coal', total: 'totalCoal' },
+          { show: 'showLoading', label: 'loadingLabel', key: 'Loading', total: 'totalLoading' },
+          { show: 'showShavings', label: 'shavingsLabel', key: 'Shavings', total: 'totalShavings' },
+          { show: 'showLabor', label: 'laborLabel', key: 'Labor', total: 'totalLabor' },
+          { show: 'showDep', label: 'depLabel', key: 'Dep', total: 'totalDep' },
+          { show: 'showFuel', label: 'fuelLabel', key: 'Fuel', total: 'totalFuel' },
+          { show: 'showMisc1', label: 'misc1Label', key: 'Misc1', total: 'totalMisc1' },
+          { show: 'showMisc2', label: 'misc2Label', key: 'Misc2', total: 'totalMisc2' },
+          { show: 'showMisc3', label: 'misc3Label', key: 'Misc3', total: 'totalMisc3' },
+          { show: 'showMisc4', label: 'misc4Label', key: 'Misc4', total: 'totalMisc4' },
+        ];
         const expenses = [];
-        if (this.settings.showFeed && summary.totalFeedCost > 0) 
-          expenses.push({ label: this.settings.feedLabel, value: summary.totalFeedCost });
-        if (this.settings.showPoult && summary.totalPoultCost > 0) 
-          expenses.push({ label: this.settings.poultLabel, value: summary.totalPoultCost });
-        if (this.settings.showMeds && summary.totalMeds > 0) 
-          expenses.push({ label: this.settings.medsLabel, value: summary.totalMeds });
-        if (this.settings.showClean && summary.totalClean > 0) 
-          expenses.push({ label: this.settings.cleanLabel, value: summary.totalClean });
-        if (this.settings.showPest && summary.totalPest > 0) 
-          expenses.push({ label: this.settings.pestLabel, value: summary.totalPest });
-        if (this.settings.showWater && summary.totalWater > 0) 
-          expenses.push({ label: this.settings.waterLabel, value: summary.totalWater });
-        if (this.settings.showEquip && summary.totalEquip > 0) 
-          expenses.push({ label: this.settings.equipLabel, value: summary.totalEquip });
-        if (this.settings.showRepairs && summary.totalRepairs > 0) 
-          expenses.push({ label: this.settings.repairsLabel, value: summary.totalRepairs });
-        if (this.settings.showElectric && summary.totalElectric > 0) 
-          expenses.push({ label: this.settings.electricLabel, value: summary.totalElectric });
-        if (this.settings.showGas && summary.totalGas > 0) 
-          expenses.push({ label: this.settings.gasLabel, value: summary.totalGas });
-        if (this.settings.showCoal && summary.totalCoal > 0) 
-          expenses.push({ label: this.settings.coalLabel, value: summary.totalCoal });
-        if (this.settings.showLoading && summary.totalLoading > 0) 
-          expenses.push({ label: this.settings.loadingLabel, value: summary.totalLoading });
-        if (this.settings.showShavings && summary.totalShavings > 0) 
-          expenses.push({ label: this.settings.shavingsLabel, value: summary.totalShavings });
-        if (this.settings.showLabor && summary.totalLabor > 0) 
-          expenses.push({ label: this.settings.laborLabel, value: summary.totalLabor });
-        if (this.settings.showDep && summary.totalDep > 0) 
-          expenses.push({ label: this.settings.depLabel, value: summary.totalDep });
-        if (this.settings.showFuel && summary.totalFuel > 0) 
-          expenses.push({ label: this.settings.fuelLabel, value: summary.totalFuel });
+        expDefs.forEach(def => {
+          const val = summary[def.total] || 0;
+          if (!this.settings[def.show] || val === 0) return;
+          expenses.push({ label: this.settings[def.label], value: val });
+          // Add active sub-items
+          const subs = (expSubs[def.key] || []).filter(s => s.active !== false);
+          subs.forEach((sub, i) => {
+            const subVal = (summary.expSubTotals[def.key] || {})[i] || 0;
+            if (subVal > 0) expenses.push({ label: '  ↳ ' + sub.label, value: subVal, isSub: true });
+          });
+        });
 
         return expenses.map((exp, idx) => `
-          <div class="expense-row" ${idx === expenses.length - 1 ? 'style="border-bottom: none;"' : ''}>
-            <span class="expense-label">${this.escapeHtml(exp.label)}:</span>
-            <strong>${this.fmt(exp.value)}</strong>
+          <div class="expense-row" ${idx === expenses.length - 1 ? 'style="border-bottom: none;"' : ''} ${exp.isSub ? 'style="padding-left: 20px; opacity: 0.8;"' : ''}>
+            <span class="expense-label" style="${exp.isSub ? 'font-size: 0.9em; color: #aaa;' : ''}">${this.escapeHtml(exp.label)}:</span>
+            <strong style="${exp.isSub ? 'font-size: 0.9em; color: #aaa;' : ''}">${this.fmt(exp.value)}</strong>
           </div>
         `).join('');
       }
@@ -9257,6 +9585,8 @@
           totalPest: 0, totalWater: 0, totalEquip: 0, totalRepairs: 0,
           totalElectric: 0, totalGas: 0, totalCoal: 0, totalLoading: 0,
           totalShavings: 0, totalLabor: 0, totalDep: 0, totalFuel: 0,
+          totalMisc1: 0, totalMisc2: 0, totalMisc3: 0, totalMisc4: 0,
+          expSubTotals: {},
           adg: 0, fcr: 0, livability: 0, avgAge: 0, avgWeight: 0,
           avgPricePerLb: 0, profitPerBird: 0, profitPerSqFt: 0, sqFtPerBird: 0
         };
@@ -9274,6 +9604,18 @@
           summary.totalSqFt += flock.barnSqFt || 0;
           
           summary.totalFeedCost += flock.fCost || 0;
+          // Accumulate dynamic sub-expense amounts
+          const expSubs = this.settings.expSubs || {};
+          const flockSubAmounts = flock.expSubAmounts || {};
+          Object.keys(expSubs).forEach(expKey => {
+            const subs = (expSubs[expKey] || []).filter(s => s.active !== false);
+            if (!subs.length) return;
+            if (!summary.expSubTotals[expKey]) summary.expSubTotals[expKey] = {};
+            const flockKeySubs = flockSubAmounts[expKey] || {};
+            subs.forEach((_, i) => {
+              summary.expSubTotals[expKey][i] = (summary.expSubTotals[expKey][i] || 0) + (flockKeySubs[i] || 0);
+            });
+          });
           summary.totalPoultCost += flock.pCost || 0;
           summary.totalMeds += flock.meds || 0;
           summary.totalClean += flock.clean || 0;
@@ -9319,47 +9661,78 @@
 
       renderExpenseSettings() {
         const expenses = [
-          { key: 'Feed', show: 'showFeed', label: 'feedLabel' },
-          { key: 'Poult', show: 'showPoult', label: 'poultLabel' },
-          { key: 'Dep', show: 'showDep', label: 'depLabel' },
-          { key: 'Fuel', show: 'showFuel', label: 'fuelLabel' },
-          { key: 'Meds', show: 'showMeds', label: 'medsLabel' },
-          { key: 'Clean', show: 'showClean', label: 'cleanLabel' },
-          { key: 'Pest', show: 'showPest', label: 'pestLabel' },
-          { key: 'Water', show: 'showWater', label: 'waterLabel' },
-          { key: 'Equip', show: 'showEquip', label: 'equipLabel' },
-          { key: 'Repairs', show: 'showRepairs', label: 'repairsLabel' },
-          { key: 'Electric', show: 'showElectric', label: 'electricLabel' },
-          { key: 'Gas', show: 'showGas', label: 'gasLabel' },
-          { key: 'Coal', show: 'showCoal', label: 'coalLabel' },
-          { key: 'Loading', show: 'showLoading', label: 'loadingLabel' },
-          { key: 'Shavings', show: 'showShavings', label: 'shavingsLabel' },
-          { key: 'Labor', show: 'showLabor', label: 'laborLabel' },
-          { key: 'Misc1', show: 'showMisc1', label: 'misc1Label' },
-          { key: 'Misc2', show: 'showMisc2', label: 'misc2Label' },
-          { key: 'Misc3', show: 'showMisc3', label: 'misc3Label' },
-          { key: 'Misc4', show: 'showMisc4', label: 'misc4Label' }
+          { key: 'Feed', show: 'showFeed', label: 'feedLabel', dataKey: 'fCost' },
+          { key: 'Poult', show: 'showPoult', label: 'poultLabel', dataKey: 'pCost' },
+          { key: 'Dep', show: 'showDep', label: 'depLabel', dataKey: 'depreciation' },
+          { key: 'Fuel', show: 'showFuel', label: 'fuelLabel', dataKey: 'fuel' },
+          { key: 'Meds', show: 'showMeds', label: 'medsLabel', dataKey: 'meds' },
+          { key: 'Clean', show: 'showClean', label: 'cleanLabel', dataKey: 'clean' },
+          { key: 'Pest', show: 'showPest', label: 'pestLabel', dataKey: 'pest' },
+          { key: 'Water', show: 'showWater', label: 'waterLabel', dataKey: 'water' },
+          { key: 'Equip', show: 'showEquip', label: 'equipLabel', dataKey: 'equip' },
+          { key: 'Repairs', show: 'showRepairs', label: 'repairsLabel', dataKey: 'repairs' },
+          { key: 'Electric', show: 'showElectric', label: 'electricLabel', dataKey: 'electric' },
+          { key: 'Gas', show: 'showGas', label: 'gasLabel', dataKey: 'gas' },
+          { key: 'Coal', show: 'showCoal', label: 'coalLabel', dataKey: 'coal' },
+          { key: 'Loading', show: 'showLoading', label: 'loadingLabel', dataKey: 'loading' },
+          { key: 'Shavings', show: 'showShavings', label: 'shavingsLabel', dataKey: 'shavings' },
+          { key: 'Labor', show: 'showLabor', label: 'laborLabel', dataKey: 'labor' },
+          { key: 'Misc1', show: 'showMisc1', label: 'misc1Label', dataKey: 'misc1' },
+          { key: 'Misc2', show: 'showMisc2', label: 'misc2Label', dataKey: 'misc2' },
+          { key: 'Misc3', show: 'showMisc3', label: 'misc3Label', dataKey: 'misc3' },
+          { key: 'Misc4', show: 'showMisc4', label: 'misc4Label', dataKey: 'misc4' }
         ];
+        const subs = this.settings.expSubs || {};
 
         return `
           <div class="container">
             <div class="modern-card">
               <h3>Expense Field Settings</h3>
               <p style="color: #888; margin-bottom: 20px;">
-                Configure which expense fields are shown when editing flocks and customize their labels.
+                Configure expense fields. Click ▶ on any expense to add sub-items (e.g. Corn, Soybeans under Feed).
               </p>
 
               <form id="expense-settings-form" onsubmit="app.handleSaveExpenseSettings(event)">
-                ${expenses.map((exp, index) => `
-                  <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #2a2a2a; border-radius: 8px; margin-bottom: 8px;">
-                    <input type="checkbox" id="${exp.show}" name="${exp.show}" 
-                      ${this.settings[exp.show] ? 'checked' : ''}
-                      style="width: 20px; height: 20px; margin: 0;">
-                    <label for="${exp.show}" style="min-width: 80px; margin: 0;">${index + 1}</label>
-                    <input type="text" name="${exp.label}" value="${this.settings[exp.label]}" 
-                      placeholder="Label for ${exp.key}" style="flex: 1; margin: 0;">
+                ${expenses.map((exp, index) => {
+                  const expSubs = subs[exp.key] || [];
+                  const hasSubItems = expSubs.length > 0;
+                  const panelId = `sub-panel-${exp.key}`;
+                  const btnId = `sub-btn-${exp.key}`;
+                  return `
+                  <div style="margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #2a2a2a; border-radius: ${hasSubItems ? '8px 8px 0 0' : '8px'};">
+                      <input type="checkbox" id="${exp.show}" name="${exp.show}"
+                        ${this.settings[exp.show] ? 'checked' : ''}
+                        style="width: 20px; height: 20px; margin: 0; flex-shrink: 0;">
+                      <label for="${exp.show}" style="min-width: 24px; margin: 0; color: #888; font-size: 0.85em;">${index + 1}</label>
+                      <input type="text" name="${exp.label}" value="${this.escapeHtml(this.settings[exp.label])}"
+                        placeholder="Label" style="flex: 1; margin: 0;">
+                      <button type="button" id="${btnId}" onclick="app.toggleExpSubPanel('${exp.key}')"
+                        title="Add/edit sub-items"
+                        style="background: ${hasSubItems ? '#1db954' : '#444'}; border: none; border-radius: 6px; padding: 5px 10px; cursor: pointer; color: white; font-size: 14px; white-space: nowrap; flex-shrink: 0;">
+                        ${hasSubItems ? '▼ ' + expSubs.length : '▶'}
+                      </button>
+                    </div>
+                    <div id="${panelId}" style="display: ${hasSubItems ? 'block' : 'none'}; background: #1a2a1a; border: 1px solid #2a4a2a; border-top: none; border-radius: 0 0 8px 8px; padding: 12px;">
+                      <div style="color: #888; font-size: 0.82em; margin-bottom: 10px;">Sub-items — check to enable, rename freely, 🗑 to remove</div>
+                      <div id="sub-list-${exp.key}">
+                        ${expSubs.map((sub, i) => `
+                          <div id="subrow-${exp.key}-${i}" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                            <input type="checkbox" name="sub_active_${exp.key}_${i}" ${sub.active !== false ? 'checked' : ''} style="width: 16px; height: 16px; margin: 0; flex-shrink: 0;">
+                            <input type="text" name="sub_label_${exp.key}_${i}" value="${this.escapeHtml(sub.label || '')}" placeholder="Sub-item name" style="flex: 1; margin: 0; background: #222; font-size: 0.9em;">
+                            <button type="button" onclick="app.removeExpSubItem('${exp.key}', ${i})" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 16px; padding: 2px 4px; flex-shrink: 0;">🗑</button>
+                          </div>
+                        `).join('')}
+                      </div>
+                      <input type="hidden" name="sub_count_${exp.key}" id="sub_count_${exp.key}" value="${expSubs.length}">
+                      <button type="button" onclick="app.addExpSubItem('${exp.key}')"
+                        style="margin-top: 6px; background: #1a3a1a; border: 1px solid #2a5a2a; border-radius: 6px; padding: 6px 14px; cursor: pointer; color: #1db954; font-size: 0.9em; width: 100%;">
+                        + Add Sub-Item
+                      </button>
+                    </div>
                   </div>
-                `).join('')}
+                  `;
+                }).join('')}
 
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 16px; font-size: 1.1em;">SAVE SETTINGS</button>
               </form>
@@ -9852,6 +10225,19 @@
               </div><!-- End of photoUploadContent -->
             </div>
 
+            <!-- Mill Report Import -->
+            <div class="modern-card" style="margin-top: 20px;">
+              <h3>📄 Mill Report Import</h3>
+              <p style="color: #888; margin-bottom: 12px;">
+                When editing a flock, tap <strong style="color:#1db954;">📄 Import Report</strong> next to Total Feed Cost to import a PDF feed ration report directly from your mill. All ingredient names and costs will be read automatically — no internet connection required.
+              </p>
+              <div style="padding: 12px; background: #1a2a1a; border: 1px solid #2a4a2a; border-radius: 8px; color: #aaa; font-size: 0.88em; line-height: 1.8;">
+                <strong style="color:#1db954;">First time:</strong> Imports all ingredients and builds your sub-fields automatically.<br>
+                <strong style="color:#1db954;">Subsequent flocks:</strong> Matches ingredient names to your existing sub-fields and fills in the amounts.<br>
+                <strong style="color:#1db954;">Requirement:</strong> PDF must be text-based (not a scanned image). Reports emailed from the mill are always text-based.
+              </div>
+            </div>
+
             <div class="modern-card">
               <h3>🧪 Sample Data (For Testing)</h3>
               <p style="color: #888; margin-bottom: 20px;">
@@ -9986,7 +10372,7 @@
             <div class="modern-card">
               <h3>Contact & Support</h3>
               <p style="color: #888; margin-bottom: 16px;">
-                FlockPro is developed and maintained by Fordham Turkey Farm. We'd love to hear your feedback!
+                FlockPro is developed and maintained by Brian Glanzer. We'd love to hear your feedback!
               </p>
               <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -9995,7 +10381,7 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <span style="color: #22c55e;">🦃</span>
-                  <span style="color: #888;">Fordham Turkey Farm</span>
+                  <span style="color: #888;">Brian Glanzer</span>
                 </div>
               </div>
               <p style="color: #666; font-size: 0.9em; margin-bottom: 16px; font-style: italic;">
@@ -10368,6 +10754,35 @@
         
         updatedFlock.fCost = this.cleanMoney(formData.get('fCost'));
         updatedFlock.pCost = this.cleanMoney(formData.get('pCost'));
+
+        // Save dynamic sub-expense amounts for all expense fields
+        const expFields = [
+          { key: 'Feed', dataKey: 'fCost' }, { key: 'Poult', dataKey: 'pCost' },
+          { key: 'Dep', dataKey: 'depreciation' }, { key: 'Fuel', dataKey: 'fuel' },
+          { key: 'Meds', dataKey: 'meds' }, { key: 'Clean', dataKey: 'clean' },
+          { key: 'Pest', dataKey: 'pest' }, { key: 'Water', dataKey: 'water' },
+          { key: 'Equip', dataKey: 'equip' }, { key: 'Repairs', dataKey: 'repairs' },
+          { key: 'Electric', dataKey: 'electric' }, { key: 'Gas', dataKey: 'gas' },
+          { key: 'Coal', dataKey: 'coal' }, { key: 'Loading', dataKey: 'loading' },
+          { key: 'Shavings', dataKey: 'shavings' }, { key: 'Labor', dataKey: 'labor' },
+          { key: 'Misc1', dataKey: 'misc1' }, { key: 'Misc2', dataKey: 'misc2' },
+          { key: 'Misc3', dataKey: 'misc3' }, { key: 'Misc4', dataKey: 'misc4' }
+        ];
+        const expSubs = this.settings.expSubs || {};
+        if (!updatedFlock.expSubAmounts) updatedFlock.expSubAmounts = {};
+        expFields.forEach(({ key, dataKey }) => {
+          const subs = expSubs[key] || [];
+          const activeSubs = subs.map((sub, realIndex) => ({ sub, realIndex })).filter(({ sub }) => sub.active !== false);
+          if (activeSubs.length > 0) {
+            const amounts = {};
+            activeSubs.forEach(({ realIndex }) => {
+              amounts[realIndex] = this.cleanMoney(formData.get(`expSub_${dataKey}_${realIndex}`));
+            });
+            updatedFlock.expSubAmounts[key] = amounts;
+            // Recalculate the top-level total from sub-amounts (fixes readonly input not saving)
+            updatedFlock[dataKey] = Object.values(amounts).reduce((s, v) => s + (v || 0), 0);
+          }
+        });
         updatedFlock.meds = this.cleanMoney(formData.get('meds'));
         updatedFlock.clean = this.cleanMoney(formData.get('clean'));
         updatedFlock.pest = this.cleanMoney(formData.get('pest'));
@@ -10656,6 +11071,587 @@
         }
       }
 
+      toggleExpSubPanel(expKey) {
+        const panel = document.getElementById(`sub-panel-${expKey}`);
+        const btn = document.getElementById(`sub-btn-${expKey}`);
+        if (!panel) return;
+        const isOpen = panel.style.display !== 'none';
+        panel.style.display = isOpen ? 'none' : 'block';
+        const subs = this.settings.expSubs && this.settings.expSubs[expKey] || [];
+        if (btn) btn.textContent = isOpen ? (subs.length ? '▼ ' + subs.length : '▶') : (subs.length ? '▼ ' + subs.length : '▼');
+      }
+
+      addExpSubItem(expKey) {
+        const countEl = document.getElementById(`sub_count_${expKey}`);
+        const list = document.getElementById(`sub-list-${expKey}`);
+        if (!countEl || !list) return;
+        const idx = parseInt(countEl.value);
+        const row = document.createElement('div');
+        row.id = `subrow-${expKey}-${idx}`;
+        row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px;';
+        row.innerHTML = `
+          <input type="checkbox" name="sub_active_${expKey}_${idx}" checked style="width:16px;height:16px;margin:0;flex-shrink:0;">
+          <input type="text" name="sub_label_${expKey}_${idx}" placeholder="Sub-item name" style="flex:1;margin:0;background:#222;font-size:0.9em;">
+          <button type="button" onclick="app.removeExpSubItem('${expKey}', ${idx})" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:16px;padding:2px 4px;flex-shrink:0;">🗑</button>
+        `;
+        list.appendChild(row);
+        countEl.value = idx + 1;
+        // Update button color
+        const btn = document.getElementById(`sub-btn-${expKey}`);
+        if (btn) { btn.style.background = '#1db954'; btn.textContent = '▼ ' + (idx + 1); }
+      }
+
+      removeExpSubItem(expKey, idx) {
+        const row = document.getElementById(`subrow-${expKey}-${idx}`);
+        if (row) row.style.display = 'none';
+        // Mark as deleted by clearing label
+        const labelEl = document.querySelector(`input[name="sub_label_${expKey}_${idx}"]`);
+        if (labelEl) labelEl.dataset.deleted = 'true';
+      }
+
+      toggleFeedSubInputs(btn) {
+        const panel = document.getElementById('feed-sub-inputs');
+        if (!panel) return;
+        const isOpen = panel.style.display !== 'none';
+        panel.style.display = isOpen ? 'none' : 'block';
+        btn.textContent = isOpen ? '▶' : '▼';
+        if (!isOpen) this.recalcExpSubTotal('fCost', 'Feed');
+      }
+
+      recalcExpSubTotal(dataKey, expKey) {
+        const subs = (this.settings.expSubs || {})[expKey] || [];
+        let total = 0;
+        subs.forEach((sub, i) => {
+          if (sub.active === false) return;
+          const inp = document.querySelector(`input[name="expSub_${dataKey}_${i}"]`);
+          if (inp) total += parseFloat(inp.value) || 0;
+        });
+        const display = document.getElementById(`exp-sub-total-${dataKey}`);
+        if (display) display.textContent = '$' + total.toFixed(2);
+        const totalInput = document.getElementById(`exp-total-input-${dataKey}`);
+        if (totalInput) totalInput.value = total.toFixed(2);
+      }
+
+      // Legacy compat
+      recalcFeedTotal() { this.recalcExpSubTotal('fCost', 'Feed'); }
+
+      toggleFeedSubSettings() {
+        this.toggleExpSubPanel('Feed');
+      }
+
+      onFeedSubEnabledChange(checkbox) {
+        const btn = document.getElementById('feed-sub-toggle-btn');
+        if (btn) btn.style.background = checkbox.checked ? '#1db954' : '#444';
+      }
+
+      async importMillReport(input) {
+        const file = input.files[0];
+        if (!file) return;
+        input.value = '';
+
+        if (file.type !== 'application/pdf') {
+          this.showToast('⚠️ Please select a PDF file', 'error');
+          return;
+        }
+
+        this.showToast('📄 Reading PDF…', 'info');
+
+        try {
+          if (!window.pdfjsLib) {
+            await new Promise((resolve, reject) => {
+              const script = document.createElement('script');
+              script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+              script.onload = resolve;
+              script.onerror = reject;
+              document.head.appendChild(script);
+            });
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+              'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          }
+
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+          // Extract text line by line using Y position grouping
+          let allItems = [];
+          for (let p = 1; p <= pdf.numPages; p++) {
+            const page = await pdf.getPage(p);
+            const content = await page.getTextContent();
+            content.items.forEach(item => {
+              if (item.str.trim()) {
+                allItems.push({ text: item.str, x: item.transform[4], y: item.transform[5] });
+              }
+            });
+          }
+
+          // Group into lines by Y (within 2pt tolerance), sort left to right, join with space
+          const lineMap = {};
+          allItems.forEach(item => {
+            const yKey = Math.round(item.y / 2) * 2; // bucket to nearest 2pt
+            if (!lineMap[yKey]) lineMap[yKey] = [];
+            lineMap[yKey].push(item);
+          });
+          const lines = Object.keys(lineMap)
+            .sort((a, b) => b - a) // top to bottom (PDF y=0 at bottom)
+            .map(y => lineMap[y].sort((a, b) => a.x - b.x).map(i => i.text.trim()).filter(t => t).join(' '));
+
+          // Parse lines — format is exactly:
+          // INGREDIENT NAME  123,456.78  $1,234.56  $0.1234
+          const ingredients = [];
+          let inTable = false;
+
+          for (const line of lines) {
+            // Detect header row
+            if (/^Ingredient\s+Units\s+Cost\s+Price/i.test(line)) { inTable = true; continue; }
+            if (!inTable) continue;
+            // Stop at totals section
+            if (/^(Total Weight|Mixing Cost|Total Ton|Cost Per Ton|Total Cost|Maximix|Per Ton)/i.test(line)) continue;
+            if (!line.trim()) continue;
+
+            // Line must contain at least one $amount to be an ingredient
+            // Pattern: NAME (words, may include numbers like 47%, 21%, 98%, 62.4%, 2.5)
+            //          then UNITS (large number like 9,400.00 or 211,442.00)
+            //          then $COST  then $PRICE
+            // Regex: capture everything up to the units number, then grab first $ amount
+            const match = line.match(/^(.+?)\s+([\d,]+\.\d{2})\s+\$([\d,]+\.\d{2})\s+\$([\d,]+\.\d{4,})$/);
+            if (!match) continue;
+
+            const name = match[1].trim().toUpperCase();
+            const units = parseFloat(match[2].replace(/,/g, ''));
+            const cost = parseFloat(match[3].replace(/,/g, ''));
+
+            if (!name || cost <= 0) continue;
+            if (!ingredients.find(ing => ing.name === name)) {
+              ingredients.push({ name, cost, units });
+            }
+          }
+
+          // Also grab Mixing Cost line — format: "Mixing Cost: $3,546.36"
+          for (const line of lines) {
+            const mixMatch = line.match(/^Mixing\s+Cost:\s*\$([\d,]+\.\d{2})/i);
+            if (mixMatch) {
+              const cost = parseFloat(mixMatch[1].replace(/,/g, ''));
+              if (cost > 0) ingredients.push({ name: 'MIXING COST', cost });
+              break;
+            }
+          }
+
+          if (!ingredients.length) {
+            throw new Error('No ingredients found — check this is a Maximix feed report PDF');
+          }
+
+          // ── Extract extra PDF fields ──────────────────────────────────────────
+          let pdfFeedLbs = 0, pdfTotalCost = 0, pdfCostPerTon = 0, pdfTons = 0;
+          let pdfRationName = '', pdfFlockId = '';
+
+          for (const line of lines) {
+            // Ration Name: "Ration Name:  My Ration"
+            const rationMatch = line.match(/^Ration\s+Name:\s+(.+)/i);
+            if (rationMatch && rationMatch[1].trim()) pdfRationName = rationMatch[1].trim();
+
+            // Flock / Group: "Flock 164" or "Group: Something"
+            const flockMatch = line.match(/^(?:Flock|Group)[:\s]+(.+)/i);
+            if (flockMatch && flockMatch[1].trim()) pdfFlockId = flockMatch[1].trim();
+
+            // Total Weight: "Total Weight: 1,006,610.75"
+            const weightMatch = line.match(/Total\s+Weight:\s*([\d,]+\.?\d*)/i);
+            if (weightMatch) pdfFeedLbs = parseFloat(weightMatch[1].replace(/,/g, ''));
+
+            // Total Ton: "Total Ton: 503.31  Cost Per Ton: $330.76"
+            const tonMatch = line.match(/Total\s+Ton:\s*([\d,]+\.?\d*)/i);
+            if (tonMatch) pdfTons = parseFloat(tonMatch[1].replace(/,/g, ''));
+            const cptMatch = line.match(/Cost\s+Per\s+Ton:\s*\$([\d,]+\.?\d*)/i);
+            if (cptMatch) pdfCostPerTon = parseFloat(cptMatch[1].replace(/,/g, ''));
+
+            // Total Cost: "Total Cost: $171,507.11"
+            const totalCostMatch = line.match(/Total\s+Cost:\s*\$([\d,]+\.?\d*)/i);
+            if (totalCostMatch) pdfTotalCost = parseFloat(totalCostMatch[1].replace(/,/g, ''));
+          }
+          // ─────────────────────────────────────────────────────────────────────
+
+          // Match or build sub-fields
+          const allSubs = (this.settings.expSubs || {})['Feed'] || [];
+          const existingSubs = allSubs.filter(s => s.active !== false);
+          const hasExistingSubs = existingSubs.length > 0;
+          if (!this.currentFlock.expSubAmounts) this.currentFlock.expSubAmounts = {};
+          if (!this.currentFlock.expSubUnits) this.currentFlock.expSubUnits = {};
+          let total = 0, filledCount = 0;
+
+          if (hasExistingSubs) {
+            const amounts = {}, unitMap = {};
+            // Use actual index in allSubs (not filtered index) so amounts align correctly
+            allSubs.forEach((sub, i) => {
+              if (sub.active === false) return;
+              const subName = sub.label.toUpperCase().trim().replace(/\s+/g, ' ');
+              const match = ingredients.find(ing => {
+                const ingName = ing.name.toUpperCase().trim().replace(/\s+/g, ' ');
+                return ingName === subName;
+              });
+              if (match) match._matched = true;
+              const cost = match ? match.cost : 0;
+              amounts[i] = cost;
+              if (match && match.units) unitMap[i] = match.units;
+              total += cost;
+              if (cost > 0) filledCount++;
+            });
+
+            // Auto-add any brand new ingredients from PDF
+            const newIngredients = ingredients.filter(ing => !ing._matched);
+            if (newIngredients.length > 0) {
+              const currentSubs = this.settings.expSubs['Feed'] || [];
+              let nextIndex = allSubs.length;
+              newIngredients.forEach(ing => {
+                currentSubs.push({ label: ing.name, active: true });
+                amounts[nextIndex] = ing.cost;
+                if (ing.units) unitMap[nextIndex] = ing.units;
+                total += ing.cost;
+                nextIndex++;
+                filledCount++;
+              });
+              this.settings.expSubs['Feed'] = currentSubs;
+              await this.saveSettings();
+            }
+
+            this.currentFlock.expSubAmounts['Feed'] = amounts;
+            this.currentFlock.expSubUnits['Feed'] = unitMap;
+            this.currentFlock.fCost = total;
+            await this.saveFlock(this.currentFlock, true); // persist to Firestore (skipReload=true)
+            const newMsg = newIngredients.length > 0 ? ` (+${newIngredients.length} new)` : '';
+            this.showToast(`✅ Filled ${filledCount} fields${newMsg} — $${total.toFixed(2)} total`, 'success');
+          } else {
+            if (!this.settings.expSubs) this.settings.expSubs = {};
+            this.settings.expSubs['Feed'] = ingredients.map(ing => ({ label: ing.name, active: true }));
+            const amounts = {}, unitMap = {};
+            ingredients.forEach((ing, i) => { amounts[i] = ing.cost; if (ing.units) unitMap[i] = ing.units; total += ing.cost; });
+            this.currentFlock.expSubAmounts['Feed'] = amounts;
+            this.currentFlock.expSubUnits['Feed'] = unitMap;
+            this.currentFlock.fCost = total;
+            await this.saveSettings();
+            await this.saveFlock(this.currentFlock, true); // persist to Firestore (skipReload=true)
+            this.showToast(`✅ Built ${ingredients.length} ingredients — $${total.toFixed(2)} total`, 'success');
+          }
+
+          this.navigate('flock');
+          // Auto-fill feedLbs from PDF Total Weight
+          if (pdfFeedLbs > 0) {
+            this.currentFlock.feedLbs = pdfFeedLbs;
+            await this.saveFlock(this.currentFlock, true);
+          }
+
+          setTimeout(() => {
+            // Expand the sub-panel
+            const panel = document.getElementById('exp-sub-inputs-fCost');
+            const btn = document.querySelector('button[onclick*="toggleExpSubInputs"][onclick*="fCost"]');
+            if (panel) {
+              panel.style.display = 'block';
+              const subs = (this.settings.expSubs || {})['Feed'] || [];
+              const activeSubs = subs.filter(s => s.active !== false);
+              if (btn) btn.textContent = `\u25bc ${activeSubs.length}`;
+            }
+            // Directly write each sub-input value and units from currentFlock
+            const savedAmounts = (this.currentFlock && this.currentFlock.expSubAmounts && this.currentFlock.expSubAmounts['Feed']) || {};
+            const savedUnits = (this.currentFlock && this.currentFlock.expSubUnits && this.currentFlock.expSubUnits['Feed']) || {};
+            Object.entries(savedAmounts).forEach(([idx, val]) => {
+              const inp = document.querySelector(`input[name="expSub_fCost_${idx}"]`);
+              if (inp && val) {
+                inp.value = parseFloat(val).toFixed(2);
+                // Update units span next to this input if it exists
+                const unitSpan = inp.nextElementSibling;
+                if (unitSpan && savedUnits[idx]) {
+                  unitSpan.textContent = Number(savedUnits[idx]).toLocaleString() + ' lbs';
+                  unitSpan.style.display = '';
+                }
+              }
+            });
+            // Sync the readonly total input and display span
+            const totalInput = document.getElementById('exp-total-input-fCost');
+            const totalSpan = document.getElementById('exp-sub-total-fCost');
+            const displayTotal = (this.currentFlock && this.currentFlock.fCost) ? parseFloat(this.currentFlock.fCost).toFixed(2) : '0.00';
+            if (totalInput) totalInput.value = displayTotal;
+            if (totalSpan) totalSpan.textContent = '$' + displayTotal;
+            // Fill feedLbs input in the DOM
+            if (pdfFeedLbs > 0) {
+              const feedLbsInp = document.querySelector('input[name="feedLbs"]');
+              if (feedLbsInp) feedLbsInp.value = pdfFeedLbs.toFixed(2);
+            }
+            // Show summary of everything extra pulled from the PDF
+            const extras = [];
+            if (pdfFeedLbs > 0) extras.push('Feed Lbs: ' + pdfFeedLbs.toLocaleString());
+            if (pdfTons > 0) extras.push('Tons: ' + pdfTons.toFixed(2));
+            if (pdfCostPerTon > 0) extras.push('$/Ton: $' + pdfCostPerTon.toFixed(2));
+            if (pdfTotalCost > 0) extras.push('PDF Total: $' + pdfTotalCost.toFixed(2));
+            if (pdfFlockId) extras.push('Flock: ' + pdfFlockId);
+            if (pdfRationName) extras.push('Ration: ' + pdfRationName);
+            if (extras.length > 0) {
+              this.showToast('Also from PDF — ' + extras.join(' | '), 'info');
+            }
+          }, 150);
+
+        } catch (err) {
+          console.error('Mill report import error:', err);
+          this.showToast('❌ ' + err.message, 'error');
+        }
+      }
+
+      async importSettlement(input) {
+        const file = input.files[0];
+        if (!file) return;
+        input.value = '';
+
+        const isExcel = file.name.match(/\.(xls|xlsx)$/i);
+        const isPDF   = file.type === 'application/pdf';
+
+        if (!isExcel && !isPDF) {
+          this.showToast('⚠️ Please select an Excel (.xls/.xlsx) or PDF settlement file', 'error');
+          return;
+        }
+
+        this.showToast('📄 Reading settlement sheet…', 'info');
+
+        try {
+          let data = {}; // will hold parsed values
+
+          if (isExcel) {
+            // ---- SheetJS Excel parsing ----
+            if (!window.XLSX) {
+              await new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+                s.onload = resolve; s.onerror = reject;
+                document.head.appendChild(s);
+              });
+            }
+            const ab = await file.arrayBuffer();
+            const wb = window.XLSX.read(ab, { type: 'array', cellDates: true });
+            const ws = wb.Sheets[wb.SheetNames[0]]; // "Regular Settlement"
+            const rows = window.XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+
+            // Helper: find row where col0 matches label, return colN value
+            const findVal = (label, col = 1) => {
+              const row = rows.find(r => r[0] && String(r[0]).toLowerCase().trim().startsWith(label.toLowerCase()));
+              return row ? row[col] : null;
+            };
+            const findVal4 = (label) => findVal(label, 4); // many values are in col 4 (index 4)
+            const findVal5 = (label) => findVal(label, 5);
+
+            const toISO = (v) => {
+              if (!v) return '';
+              const d = v instanceof Date ? v : new Date(v);
+              if (isNaN(d)) return '';
+              return d.toISOString().split('T')[0];
+            };
+
+            data.startedDate  = toISO(findVal('Placement Date', 1));
+            data.shippedDate  = toISO(findVal('Process Date', 1));
+            data.flockNumRaw  = findVal('Flock Number:', 1);
+            data.headPlaced   = findVal('Head Placed:', 1);
+            data.headDelivered = findVal('Head Delivered:', 1);
+            data.liveAvgWt    = findVal('Live Avg. Wt.:', 1);
+            data.poultSource  = findVal('Flock Number:', 5); // col E has Poult Source value
+            // Poult Source is on the 'Flock Number' row col 5
+            const flockNumRow = rows.find(r => r[0] && String(r[0]).toLowerCase().includes('flock number'));
+            if (flockNumRow) data.poultSource = flockNumRow[5] || null;
+            const placementRow = rows.find(r => r[0] && String(r[0]).toLowerCase().includes('placement date'));
+            if (placementRow) data.breed = placementRow[5] || null;
+
+            data.revenue      = findVal('Net Adjusted Live Payment', 4)
+                              || findVal('Net Live Payment', 4);
+            data.pricePerLb   = findVal('Grower Payment per Net Live Pound', 5);
+            data.feedLbsPerBird = findVal4(' - Feed Pounds per Bird');
+            data.feedConv     = findVal4(' - Feed Conversion');
+            data.liveHaul     = findVal('Standard Live Haul Charge', 4);
+            if (data.liveHaul && data.liveHaul < 0) data.liveHaul = Math.abs(data.liveHaul);
+
+          } else {
+            // ---- PDF.js fallback (for text-based PDFs) ----
+            if (!window.pdfjsLib) {
+              await new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+                s.onload = resolve; s.onerror = reject;
+                document.head.appendChild(s);
+              });
+              window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+                'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            }
+            const ab = await file.arrayBuffer();
+            const pdf = await window.pdfjsLib.getDocument({ data: ab }).promise;
+            let text = '';
+            for (let p = 1; p <= pdf.numPages; p++) {
+              const page = await pdf.getPage(p);
+              const content = await page.getTextContent();
+              text += content.items.map(i => i.str).join(' ') + '\n';
+            }
+            if (!text.trim()) {
+              this.showToast('⚠️ This PDF is a scanned image — please use the Excel (.xls) version instead', 'error');
+              return;
+            }
+            const exN = (pat) => { const m = text.match(pat); return m ? parseFloat(m[1].replace(/,/g,'')) : null; };
+            const exS = (pat) => { const m = text.match(pat); return m ? m[1].trim() : null; };
+            const toISO = (str) => { if (!str) return ''; const d = new Date(str); return isNaN(d) ? '' : d.toISOString().split('T')[0]; };
+
+            data.startedDate  = toISO(exS(/Placement\s+Date\s+(\w+ \d+,?\s*\d{4})/i));
+            data.shippedDate  = toISO(exS(/Process\s+Date[^:]*:?\s*(\w+ \d+,?\s*\d{4})/i));
+            data.flockNumRaw  = exS(/Flock\s+Number\s+([\w\-]+)/i);
+            data.headPlaced   = exN(/Head\s+Placed\s+([\d,]+)/i);
+            data.headDelivered = exN(/Head\s+Delivered\s+([\d,]+)/i);
+            data.liveAvgWt    = exN(/Live\s+Avg\.?\s*Wt\.?\s*[:\s]+([\d.]+)/i);
+            data.revenue      = exN(/Net\s+Adjusted\s+Live\s+Payment\s+\$([\d,]+\.?\d*)/i);
+            data.pricePerLb   = exN(/Grower\s+Payment\s+per\s+Net\s+Live\s+Pound\s+\$([\d.]+)/i);
+            data.feedLbsPerBird = exN(/Feed\s+Pounds\s+per\s+Bird\s+([\d.]+)/i);
+            data.feedConv     = exN(/Feed\s+Conversion\s+([\d.]+)/i);
+            data.liveHaul     = exN(/Standard\s+Live\s+Haul\s+Charge\s+\(\$([\d,]+\.?\d*)\)/i);
+            data.poultSource  = exS(/Poult\s+Source\s*:?\s*([\w\-]+)/i);
+            data.breed        = exS(/Breed\s*:?\s*([\w\-]+)/i);
+          }
+
+          // ---- Apply to flock ----
+          const filled = [];
+
+          if (data.flockNumRaw) {
+            const n = parseInt(String(data.flockNumRaw).replace(/\D/g,''));
+            if (n) { this.currentFlock.id = n; filled.push('Flock #'); }
+          }
+          if (data.startedDate)   { this.currentFlock.startedDate = data.startedDate;   filled.push('Start Date'); }
+          if (data.shippedDate)   { this.currentFlock.shippedDate = data.shippedDate;   filled.push('Shipped Date'); }
+          if (data.headPlaced)    { this.currentFlock.placed = data.headPlaced;          filled.push('Placed'); }
+          if (data.headDelivered) { this.currentFlock.shipped = data.headDelivered;      filled.push('Shipped'); }
+          if (data.liveAvgWt)     { this.currentFlock.weight = data.liveAvgWt;           filled.push('Avg Weight'); }
+          if (data.revenue)       { this.currentFlock.revenue = Math.round(data.revenue * 100) / 100; filled.push('Revenue'); }
+          if (data.pricePerLb)    { this.currentFlock.pricePerLb = data.pricePerLb;      filled.push('Price/lb'); }
+          if (data.feedLbsPerBird && data.headDelivered) {
+            this.currentFlock.feedLbs = Math.round(data.feedLbsPerBird * data.headDelivered);
+            filled.push('Feed Lbs');
+          }
+          if (data.liveHaul)      { this.currentFlock.loading = Math.round(data.liveHaul * 100) / 100; filled.push('Live Haul/Loading'); }
+          if (data.poultSource)   { this.currentFlock.poultSupplier = String(data.poultSource); filled.push('Poult Source'); }
+          if (data.breed)         { this.currentFlock.hatchery = String(data.breed); filled.push('Breed'); }
+          if (data.feedConv) {
+            const fcNote = 'FCR: ' + parseFloat(data.feedConv).toFixed(3);
+            if (!this.currentFlock.notes || !this.currentFlock.notes.includes('FCR:')) {
+              this.currentFlock.notes = this.currentFlock.notes ? this.currentFlock.notes + '\n' + fcNote : fcNote;
+              filled.push('FCR → Notes');
+            }
+          }
+
+          if (filled.length === 0) {
+            this.showToast('⚠️ No matching data found — check this is a Dakota Provisions settlement', 'error');
+            return;
+          }
+
+          // Save to Firestore only if flock has a valid ID
+          if (this.currentFlock.id && this.currentFlock.id > 0) {
+            try {
+              await this.saveFlock(this.currentFlock, true);
+            } catch(saveErr) {
+              // Don't block UI — data is already in currentFlock, just show warning
+              console.warn('Settlement save error:', saveErr.message);
+            }
+          }
+
+          // Re-render so form shows imported values
+          this.render();
+
+          // Also fill DOM inputs directly after render in case render beats the state update
+          setTimeout(() => {
+            const fillInput = (name, val) => {
+              if (val === null || val === undefined || val === '') return;
+              const el = document.querySelector('[name="' + name + '"]');
+              if (el) el.value = val;
+            };
+            if (data.flockNumRaw) { const n = parseInt(String(data.flockNumRaw).replace(/\D/g,'')); if(n) fillInput('id', n); }
+            fillInput('startedDate',  data.startedDate);
+            fillInput('shippedDate',  data.shippedDate);
+            fillInput('placed',       data.headPlaced);
+            fillInput('shipped',      data.headDelivered);
+            fillInput('weight',       data.liveAvgWt);
+            fillInput('revenue',      data.revenue       ? data.revenue.toFixed(2)   : null);
+            fillInput('pricePerLb',   data.pricePerLb    ? data.pricePerLb.toFixed(4) : null);
+            fillInput('feedLbs',      data.feedLbsPerBird && data.headDelivered ? Math.round(data.feedLbsPerBird * data.headDelivered) : null);
+            fillInput('loading',      data.liveHaul      ? data.liveHaul.toFixed(2)  : null);
+            fillInput('poultSupplier', data.poultSource);
+            fillInput('hatchery',     data.breed);
+          }, 50);
+
+          this.showToast('✅ Imported ' + filled.length + ' fields: ' + filled.join(', '), 'success');
+
+        } catch (err) {
+          this.showToast('❌ Settlement import failed: ' + err.message, 'error');
+        }
+      }
+
+      saveAnthropicKey() {
+        const key = (document.getElementById('anthropicApiKey')?.value || '').trim();
+        this.settings.anthropicApiKey = key;
+        this.saveSettings();
+        this.showToast(key ? '✅ Anthropic API key saved!' : '⚠️ API key cleared', key ? 'success' : 'warning');
+      }
+
+      renderExpenseField(expKey, labelKey, dataKey) {
+        const subs = (this.settings.expSubs || {})[expKey] || [];
+        const activeSubs = subs.map((sub, realIndex) => ({ sub, realIndex })).filter(({ sub }) => sub.active !== false);
+        const hasSubs = activeSubs.length > 0;
+        const subAmounts = (this.currentFlock.expSubAmounts || {})[expKey] || {};
+        const subUnits = (this.currentFlock.expSubUnits || {})[expKey] || {};
+        const subQty = (this.currentFlock.expSubQty || {})[expKey] || {};
+        const currentTotal = this.currentFlock[dataKey] || 0;
+        const isFeed = expKey === 'Feed';
+        const isWaterOrMeds = expKey === 'Water' || expKey === 'Meds';
+        return `
+          <div class="money-group" style="grid-column: 1 / -1;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <label style="flex: 1; margin: 0;">${this.escapeHtml(this.settings[labelKey])}</label>
+              ${isFeed ? `
+                <button type="button" onclick="document.getElementById('mill-report-input').click()"
+                  title="Import mill report (photo or PDF)"
+                  style="background: #1a3a2a; border: 1px solid #1db954; border-radius: 6px; padding: 3px 10px; cursor: pointer; color: #1db954; font-size: 13px; white-space: nowrap;">
+                  📄 Import Report
+                </button>
+                <input type="file" id="mill-report-input" accept="application/pdf" style="display:none"
+                  onchange="app.importMillReport(this)">
+              ` : ''}
+              ${hasSubs ? `
+                <button type="button" onclick="app.toggleExpSubInputs(this,'${expKey}','${dataKey}')"
+                  style="background: #1db954; border: none; border-radius: 6px; padding: 3px 10px; cursor: pointer; color: white; font-size: 13px;">▶ ${activeSubs.length}</button>
+              ` : ''}
+            </div>
+            ${hasSubs ? `
+              <div id="exp-sub-inputs-${dataKey}" style="display:none; background:#1a2a1a; border:1px solid #2a4a2a; border-radius:8px; padding:10px; margin-bottom:6px;">
+                <div style="color:#888; font-size:0.82em; margin-bottom:8px;">Sub-items — total auto-calculates</div>
+                ${activeSubs.map(({ sub, realIndex }) => `
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <label style="min-width:100px; font-size:0.88em; margin:0; color:#aaa;">${this.escapeHtml(sub.label)}</label>
+                    <input type="number" name="expSub_${dataKey}_${realIndex}" value="${this.fmtInput(subAmounts[realIndex] || 0, 2)}"
+                      min="0" max="9999999" step="0.01" inputmode="decimal"
+                      oninput="app.recalcExpSubTotal('${dataKey}','${expKey}')"
+                      style="flex:1; margin:0;">
+                    ${isWaterOrMeds && subQty[realIndex] ? `<span style="font-size:0.78em; color:#22c55e; white-space:nowrap; min-width:70px; text-align:right;">${this.escapeHtml(subQty[realIndex])}</span>` : subUnits[realIndex] ? `<span style="font-size:0.78em; color:#7cb87c; white-space:nowrap; min-width:70px;">${Number(subUnits[realIndex]).toLocaleString()} lbs</span>` : ''}
+                  </div>
+                `).join('')}
+                <div style="display:flex; align-items:center; gap:8px; border-top:1px solid #2a4a2a; padding-top:8px; margin-top:4px;">
+                  <label style="min-width:100px; font-size:0.88em; margin:0; color:#1db954; font-weight:bold;">Total</label>
+                  <span id="exp-sub-total-${dataKey}" style="color:#1db954; font-weight:bold;">$${activeSubs.reduce((a, { realIndex }) => a + (subAmounts[realIndex] || 0), 0).toFixed(2)}</span>
+                </div>
+              </div>
+              <input type="number" name="${dataKey}" id="exp-total-input-${dataKey}" value="${this.fmtInput(activeSubs.reduce((a, { realIndex }) => a + (subAmounts[realIndex] || 0), 0), 2)}" min="0" max="9999999" step="0.01" inputmode="decimal" readonly style="background:#0f220f; color:#1db954; cursor:default;" title="Auto-sum from sub-items">
+            ` : `
+              <input type="number" name="${dataKey}" value="${this.fmtInput(currentTotal, 2)}" min="0" max="9999999" step="0.01" inputmode="decimal">
+            `}
+          </div>
+        `;
+      }
+
+      toggleExpSubInputs(btn, expKey, dataKey) {
+        const panel = document.getElementById(`exp-sub-inputs-${dataKey}`);
+        if (!panel) return;
+        const isOpen = panel.style.display !== 'none';
+        panel.style.display = isOpen ? 'none' : 'block';
+        const subs = (this.settings.expSubs || {})[expKey] || [];
+        const activeSubs = subs.filter(s => s.active !== false);
+        btn.textContent = isOpen ? `▶ ${activeSubs.length}` : `▼ ${activeSubs.length}`;
+        if (!isOpen) this.recalcExpSubTotal(dataKey, expKey);
+      }
+
       handleSaveExpenseSettings(event) {
         event.preventDefault();
         const form = event.target;
@@ -10702,6 +11698,27 @@
         this.settings.misc2Label = formData.get('misc2Label') || 'Miscellaneous 2';
         this.settings.misc3Label = formData.get('misc3Label') || 'Miscellaneous 3';
         this.settings.misc4Label = formData.get('misc4Label') || 'Miscellaneous 4';
+
+        // Save dynamic sub-expenses for all expense keys
+        const expKeys = ['Feed','Poult','Dep','Fuel','Meds','Clean','Pest','Water',
+                         'Equip','Repairs','Electric','Gas','Coal','Loading','Shavings',
+                         'Labor','Misc1','Misc2','Misc3','Misc4'];
+        if (!this.settings.expSubs) this.settings.expSubs = {};
+        expKeys.forEach(key => {
+          const countEl = document.getElementById(`sub_count_${key}`);
+          if (!countEl) return; // panel never opened = no changes
+          const count = parseInt(countEl.value) || 0;
+          const items = [];
+          for (let i = 0; i < count; i++) {
+            const labelEl = document.querySelector(`input[name="sub_label_${key}_${i}"]`);
+            if (!labelEl || labelEl.dataset.deleted === 'true') continue;
+            const label = this.sanitizeInput(labelEl.value || '').slice(0, 50);
+            if (!label) continue;
+            const active = formData.get(`sub_active_${key}_${i}`) === 'on';
+            items.push({ label, active });
+          }
+          this.settings.expSubs[key] = items;
+        });
 
         this.saveSettings();
         this.navigate('settings');
@@ -12249,7 +13266,7 @@ FlockPro:
   - Includes comprehensive documentation
 
 ═══════════════════════════════════════════════════════════════════
-Built with ❤️ for Fordham Turkey Farm
+Built with ❤️ by Brian Glanzer
 Version 2.1 - Single File Edition - February 8, 2026
 ═══════════════════════════════════════════════════════════════════
 
